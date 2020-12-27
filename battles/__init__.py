@@ -109,4 +109,4 @@ def move_item(e):
 
 
 MageWorld.listen(EntityDamageByEntityEvent, entity_damage)
-MageWorld.listen(InventoryClickEvent, move_item)
+# MageWorld.listen(InventoryClickEvent, move_item)

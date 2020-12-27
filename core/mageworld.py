@@ -73,11 +73,7 @@ class WorldInstance(object):
         return listener
 
     def get_mage(self, player_id):
-        mage_lib = self.plugins.get("mages")
-        mage = None
-        if mage_lib:
-            mage = mage_lib.mages.get_or_create(player_id)
-        return mage
+        return self.plugins["mages"].mages.get_or_create(player_id)
 
     def mage_join(self, player):
         mage = Mage(player)

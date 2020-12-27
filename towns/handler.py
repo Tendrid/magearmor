@@ -107,25 +107,21 @@ class Towns(BasePlugin):
                 else:
                     town = self.wilderness
                 if town.welcome:
-                    event.getPlayer().sendTitle(town.name, town.welcome)
+                    mage.player.sendTitle(town.name, town.welcome)
 
     @asynchronous()
     def on_player_join(self, event, mage):
-        player = event.getPlayer()
-
-        player_data = self.player_data.get_or_create(mage.uuid)
-        if not player_data.data.keys():
+        if not mage.data.keys():
             logging.debug("Player doesnt have a town")
-
-        # mage.load_plugin_data(self.lib_name, PluginData(player_data))
 
     @asynchronous()
     def on_player_quit(self, event, mage):
         # save player data
-        player_uuid = str(event.getPlayer().getUniqueId())
-        pd = self.player_data.get(player_uuid)
-        pd.save()
-        town = self.get_town_by_player_uuid(player_uuid)
+        # player_uuid = str(event.getPlayer().getUniqueId())
+        # pd = self.player_data.get(player_uuid)
+        # pd.save()
+        mage.save()
+        town = self.get_town_by_player_uuid(mage.uuid)
         if town:
             self.towns.get(town.uuid).save()
 
@@ -136,7 +132,6 @@ class Towns(BasePlugin):
         block_chunk = block.getLocation().getChunk()
         town = self.get_town_by_chunk(block_chunk)
         if town:
-            mage = MageWorld.get_mage(str(event.getPlayer().getUniqueId()))
             player_role = town.get_player_role(mage.uuid)
             print(player_role)
             event.setCancelled(True)

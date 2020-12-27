@@ -11,13 +11,18 @@ class Mage(DataStorage):
 
     armor = None
 
+    def login(self):
+        self.__player = SERVER.getPlayer(self.uuid)
+
+    def logoff(self):
+        self.__player = SERVER.getOfflinePlayer(UUID.fromString(self.uuid))
+
     @property
     def player(self):
         if self.__player is None:
-            player = SERVER.getPlayer(self.uuid)
-            if player is None:
-                player = SERVER.getOfflinePlayer(UUID.fromString(self.uuid))
-            self.__player = player
+            self.login()
+        if self.__player is None:
+            self.logoff()
         return self.__player
 
     @property

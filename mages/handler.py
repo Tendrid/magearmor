@@ -14,10 +14,10 @@ class Mages(BasePlugin):
         for player in SERVER.getOnlinePlayers():
             self.players.get_or_create(player)
 
+    @asynchronous()
     def on_player_join(self, event, mage):
-        self.mage_join(event.player)
+        mage.login()
 
-    def mage_join(self, player):
-        player_uuid = str(player.getUniqueId())
-        mage = self.mages.get_or_create(player_uuid)
-        return mage
+    @asynchronous()
+    def on_player_quit(self, event, mage):
+        mage.logoff()
