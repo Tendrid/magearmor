@@ -1,0 +1,86 @@
+from mcapi import SERVER
+
+import unittest
+from core.mageworld import MageWorld
+from core.storage import DataStorage, IndexStorage, BASE_DIR
+
+from org.bukkit import World
+import os
+import shutil
+import json
+import time
+
+TEST_LIB = "test"
+
+
+class TestMageWorld(unittest.TestCase):
+    def test_world(self):
+        self.assertIsInstance(MageWorld.world, World)
+
+    def test_mage(self):
+        tendrid_id = "0d909fe4-ddcf-4127-ba42-5e539a20ac2c"
+        test_players = {}
+        for player in SERVER.getOfflinePlayers():
+            test_players[str(player.getUniqueId())] = player
+        test_player = test_players[tendrid_id]
+
+        self.assertEquals(str(test_player.getUniqueId()), tendrid_id)
+
+        MageWorld.mage_join(test_player)
+        test_mage = MageWorld.get_mage(tendrid_id)
+        self.assertEquals(test_mage.player, test_player)
+
+
+class TestDataStorage(unittest.TestCase):
+    def test_create_file(self):
+        path = os.path.abspath(os.path.join(*(BASE_DIR + ("ds_test",))))
+        os.makedirs(path)
+        store = DataStorage("test", "{}/test.json".format(path), {"a": "b"})
+        store.save()
+
+        self.assertEquals(store.data["a"], "b")
+
+        self.assertTrue(os.path.isfile("{}/test.json".format(path)))
+        with open("{}/test.json".format(path)) as fh:
+            j = json.load(fh)
+        self.assertEquals(j.get("a"), "b")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(os.path.abspath(os.path.join(*(BASE_DIR + ("ds_test",)))))
+
+
+class TestIndexStorage(unittest.TestCase):
+    def test_create_dir(self):
+        path = os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB, "test_a"))))
+        store = IndexStorage(TEST_LIB, "test_a")
+        self.assertTrue(os.path.isdir(path))
+
+    def test_create_file(self):
+        store = IndexStorage(TEST_LIB, "test_a")
+        path = os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB, "test_a"))))
+
+        test_obj = {
+            "number": 12,
+            "string": "here is my string",
+            "list": ["a", "b", "c"],
+            "dict": {"more": "data"},
+            "bool": True,
+        }
+
+        store.add("file1", test_obj)
+
+        self.assertTrue(os.path.isfile("{}/file1.json".format(path)))
+
+    def test_read_check(self):
+        store = IndexStorage(TEST_LIB, "test_a")
+        test_file = store.get("file1")
+        self.assertEquals(test_file.data["number"], 12)
+        self.assertEquals(test_file.data["string"], "here is my string")
+        self.assertEquals(test_file.data["list"], ["a", "b", "c"])
+        self.assertEquals(test_file.data["dict"]["more"], "data")
+        self.assertEquals(test_file.data["bool"], True)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB,)))))

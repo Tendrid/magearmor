@@ -1,0 +1,9 @@
+{
+    "use_dynmap": false,
+    "language": "english",
+    "world_edit_freq": 5,
+    "claiming": {
+        "claiming_cost": 100,
+        "outpost_claiming_cost": 400
+    }
+}

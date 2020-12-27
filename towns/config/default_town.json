@@ -1,0 +1,31 @@
+{
+    "name": "Village",
+    "welcome": "Welcome to town",
+    "xp": 0,
+    "ranks": [
+        "Outsider",
+        "Peasant",
+        "Citizen",
+        "Leader",
+        "Admin",
+        "Owner"
+    ],
+    "bonus_outposts": 0,
+    "bonus_chunks": 0,
+    "chunks": [],
+    "spawnpoint": [],
+    "permissions": {
+        "break_block": 4
+    },
+    "members": {},
+    "rule": {
+        "pistons": true,
+        "pvp": false,
+        "pve": false,
+        "titlescreen": true,
+        "firespread": false,
+        "mobspawn": false,
+        "chests": false,
+        "spells": true
+    }
+}
