@@ -25,7 +25,8 @@ class BasePlugin(object):
     lib_name = "unknown"
 
     def __init__(self):
-        self.reload()
+        self.load()
+        self.on_load()
         self.register_callbacks()
 
     def register_callbacks(self):
@@ -35,7 +36,10 @@ class BasePlugin(object):
                 if callable(method):
                     MageWorld.listen(event_handler, method)
 
-    def reload(self):
+    def on_load(self):
+        pass
+
+    def load(self):
         self._load_config()
 
     def _load_config(self):

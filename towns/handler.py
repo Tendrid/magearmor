@@ -85,7 +85,7 @@ class Towns(BasePlugin):
     #     towns = MageWorld.get_config(self.lib_name, "towns")
     #     self.config = towns_default.update(towns)
 
-    def load(self):
+    def on_load(self):
         self.player_data = IndexStorage(self.lib_name, "players")
         self.towns = IndexStorage(self.lib_name, "towns", Town)
         for town_uuid, town in self.towns:
@@ -95,7 +95,7 @@ class Towns(BasePlugin):
         # run towns_update_dynmap_all_towns
 
     @asynchronous()
-    def on_player_move(self, event):
+    def on_player_move(self, event, mage):
         if event.getFrom().getChunk() != event.getTo().getChunk():
             to_chunk = event.getTo().getChunk()
             to_town = self.claims_by_loc[to_chunk.getX()].get(to_chunk.getZ())
@@ -110,22 +110,17 @@ class Towns(BasePlugin):
                     event.getPlayer().sendTitle(town.name, town.welcome)
 
     @asynchronous()
-    def on_server_load(self, event):
-        self.load()
-
-    @asynchronous()
-    def on_player_join(self, event):
+    def on_player_join(self, event, mage):
         player = event.getPlayer()
-        mage = MageWorld.get_mage(str(player.getUniqueId()))
 
         player_data = self.player_data.get_or_create(mage.uuid)
         if not player_data.data.keys():
             logging.debug("Player doesnt have a town")
 
-        mage.load_plugin_data(self.lib_name, PluginData(player_data))
+        # mage.load_plugin_data(self.lib_name, PluginData(player_data))
 
     @asynchronous()
-    def on_player_quit(self, event):
+    def on_player_quit(self, event, mage):
         # save player data
         player_uuid = str(event.getPlayer().getUniqueId())
         pd = self.player_data.get(player_uuid)
@@ -136,7 +131,7 @@ class Towns(BasePlugin):
 
         # save town data
 
-    def on_player_breaks_block(self, event):
+    def on_player_breaks_block(self, event, mage):
         block = event.getBlock()
         block_chunk = block.getLocation().getChunk()
         town = self.get_town_by_chunk(block_chunk)

@@ -41,7 +41,10 @@ class EventListener(Listener):
         self.func = func
 
     def execute(self, event):
-        self.func(event)
+        mage = None
+        if hasattr(event, "getPlayer"):
+            mage = MageWorld.get_mage(str(event.getPlayer().getUniqueId()))
+        self.func(event, mage)
 
 
 class WorldInstance(object):
@@ -56,9 +59,9 @@ class WorldInstance(object):
         # self.logger.setLevel(logging.INFO)
         logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
 
-        for player in SERVER.getOnlinePlayers():
-            if self.players.get(str(player.getUniqueId())) is None:
-                self.mage_join(player)
+        # for player in SERVER.getOnlinePlayers():
+        #     if self.players.get(str(player.getUniqueId())) is None:
+        #         self.mage_join(player)
 
     def listen(self, event_type, execfunc, priority=EventPriority.NORMAL):
         # execfunc signature: execfunc(event)
@@ -70,9 +73,10 @@ class WorldInstance(object):
         return listener
 
     def get_mage(self, player_id):
-        mage = self.players.get(player_id)
-        if not mage:
-            mage = self.mage_join(SERVER.getPlayer(player_id))
+        mage_lib = self.plugins.get("mages")
+        mage = None
+        if mage_lib:
+            mage = mage_lib.mages.get_or_create(player_id)
         return mage
 
     def mage_join(self, player):
@@ -80,11 +84,13 @@ class WorldInstance(object):
         self.players[str(player.getUniqueId())] = mage
         return mage
 
+    """
     def player_joins(self, event):
         # SERVER.broadcastMessage("Player joined")
         self.mage_join(event.player)
         # print(event.getJoinMessage())
         # event.setJoinMessage("ur mom joind teh gam lol")
+    """
 
     def register_config(self, lib_name, config_name):
         logging.info("Registering config: {0}".format(config_name))
@@ -109,4 +115,3 @@ class WorldInstance(object):
 
 
 MageWorld = WorldInstance()
-MageWorld.listen(PlayerJoinEvent, MageWorld.player_joins)

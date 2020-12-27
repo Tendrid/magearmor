@@ -11,8 +11,10 @@ from core.mageworld import MageWorld
 import battles
 import spells
 
+from mages.handler import Mages
 from towns.handler import Towns
 
+MageWorld.load_plugin(Mages)
 MageWorld.load_plugin(Towns)
 
 
@@ -29,25 +31,26 @@ def claim_that_shit(player, command):
 add_command("claim", claim_that_shit)
 
 
-if True:
-    print("~~~~~~~~~~~~~~~~~~~~~ Running MageArmor Tests ~~~~~~~~~~~~~~~~~~~~~")
-    import unittest
-    from core.tests import *
-    from towns.tests import *
+print("~~~~~~~~~~~~~~~~~~~~~ Running MageArmor Tests ~~~~~~~~~~~~~~~~~~~~~")
+import unittest
+from core.tests import *
+from towns.tests import *
+from mages.tests import *
 
-    suite = unittest.TestLoader()
-    tests = [
-        TestMageWorld,
-        TestDataStorage,
-        TestIndexStorage,
-        TestTownFiles,
-        TestWilderness,
-    ]
-    test_runner = []
-    for test in tests:
-        test_runner.append(suite.loadTestsFromTestCase(test))
+suite = unittest.TestLoader()
+tests = [
+    TestMageWorld,
+    TestDataStorage,
+    TestIndexStorage,
+    TestTownFiles,
+    TestWilderness,
+    TestMageFiles,
+]
+test_runner = []
+for test in tests:
+    test_runner.append(suite.loadTestsFromTestCase(test))
 
-    # unittest.TestSuite([suite1, suite2])
+unittest.TextTestRunner(verbosity=2).run(unittest.TestSuite(test_runner))
 
-    unittest.TextTestRunner(verbosity=2).run(unittest.TestSuite(test_runner))
+if False:
     SERVER.shutdown()

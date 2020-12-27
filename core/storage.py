@@ -72,6 +72,7 @@ class IndexStorage(object):
         if self.files.get(key) is None:
             file_path = os.path.join(self.path, "{}.json".format(key))
             self.files[key] = self.storage_module(key, file_path)
+            self.files[key].save()
         return self.files[key]
 
     def __iter__(self):
