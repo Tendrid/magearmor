@@ -3,7 +3,7 @@ from mcapi import SERVER
 import unittest
 from core.mageworld import MageWorld
 from core.storage import DataStorage, IndexStorage, BASE_DIR
-from mages.handler import Mages
+from mages import Mages
 
 from org.bukkit import World
 import os

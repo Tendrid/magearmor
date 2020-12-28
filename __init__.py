@@ -11,8 +11,8 @@ from core.mageworld import MageWorld
 import battles
 import spells
 
-from mages.handler import Mages
-from towns.handler import Towns
+from mages import Mages
+from towns import Towns
 
 MageWorld.load_plugin(Mages)
 MageWorld.load_plugin(Towns)

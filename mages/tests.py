@@ -1,7 +1,7 @@
 import unittest
 from mcapi import SERVER
 from core.mageworld import MageWorld
-from handler import Mages
+from . import Mages
 from mage import Mage
 from core.plugin import BasePlugin
 from core.storage import IndexStorage

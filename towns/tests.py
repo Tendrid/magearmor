@@ -1,7 +1,7 @@
 import unittest
 from mcapi import SERVER
 from core.mageworld import MageWorld
-from handler import Towns
+from . import Towns
 from town import Town
 from core.plugin import BasePlugin
 
