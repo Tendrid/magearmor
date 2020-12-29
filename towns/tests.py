@@ -47,6 +47,11 @@ class TestTownFiles(unittest.TestCase):
         self.assertNotEquals(town_obj.uuid, None)
 
     def test_set_owner(self):
+        test_mage = activate_player(PLAYER_NOTCH)
+        plugin = MageWorld.plugins[Plugin.lib_name]
+
+        # claimed_by = plugin.get_town_by_coords(bukkit_chunk.getX(), bukkit_chunk.getZ())
+
         # check that town.owner == mage.uuid
         # check that uuid in town.members, and rank is owner
         pass

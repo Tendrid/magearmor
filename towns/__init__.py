@@ -8,6 +8,7 @@ from core.storage import IndexStorage
 
 import logging
 from collections import defaultdict
+from core.exceptions import PlayerErrorMessage
 
 
 class Wilderness(Town):
@@ -33,11 +34,8 @@ class Plugin(BasePlugin):
             self.__wilderness = Wilderness()
         return self.__wilderness
 
-    def is_claimed(self, bukkit_chunk):
-        return self.get_town_by_chunk(bukkit_chunk) is not None
-
-    def get_town_by_chunk(self, bukkit_chunk):
-        return self.claims_by_loc[bukkit_chunk.getX()].get(bukkit_chunk.getZ())
+    def get_town_by_coords(self, x, z):
+        return self.claims_by_loc[x].get(z)
 
     def player_town(self, uuid):
         player_data = self.player_data.get_or_create(mage.uuid)
@@ -48,13 +46,22 @@ class Plugin(BasePlugin):
             return self.towns.get(player_data.data.get("town"))
         return None
 
-    def claim(self, player_uuid, player_location=None):
+    def claim(self, mage, x, z, world_uuid):
         # check if claim already owned
         # check if player is in town
         # if player in town. claim type TOWN_CLAIM_TYPE_NORMAL, else TOWN_CLAIM_TYPE_CENTER
 
-        mage = MageWorld.get_mage(player_uuid)
-        town = self.get_town_by_player_uuid(player_uuid)
+        claimed_by = self.get_town_by_coords(x, z)
+        if claimed_by:
+            raise PlayerErrorMessage(
+                "This plot is already clamed by {}".format(claimed_by.name)
+            )
+
+        player_town = self.get_town_by_player_uuid(mage.uuid)
+        if not player_town:
+            raise PlayerErrorMessage("You're not in a town!")
+
+        town = self.get_town_by_player_uuid(mage.uuid)
 
         plot_type = TOWN_CLAIM_TYPE_NORMAL
         if not town:
@@ -62,20 +69,15 @@ class Plugin(BasePlugin):
             plot_type = TOWN_CLAIM_TYPE_CENTER
             town.set_owner(mage)
 
-        if not player_location:
-            player_location = mage.player.location
-        chunk = player_location.getChunk()
-
         town.add_chunk(
-            int(chunk.getX()),
-            int(chunk.getZ()),
-            str(chunk.getWorld().getUID()),
+            int(x),
+            int(z),
+            str(world_uuid),
             plot_type,
             player_uuid,
         )
 
-        self.claims_by_loc[chunk.getX()][chunk.getZ()] = town
-
+        self.claims_by_loc[x][z] = town
         self.towns.get(town.uuid).save()
 
     # def on_load_config(self):
