@@ -21,7 +21,7 @@ class Wilderness(Town):
         pass
 
 
-class Towns(BasePlugin):
+class Plugin(BasePlugin):
     lib_name = "towns"
     config_files = ("default_town", "wilderness", "config")
     claims_by_loc = defaultdict(dict)
@@ -34,15 +34,13 @@ class Towns(BasePlugin):
         return self.__wilderness
 
     def is_claimed(self, bukkit_chunk):
-        return (
-            self.claims_by_loc[bukkit_chunk.getX()].get(bukkit_chunk.getZ()) is not None
-        )
-
-    def player_town(self, uuid):
-        player_data = self.player_data.get_or_create(mage.uuid)
+        return self.get_town_by_chunk(bukkit_chunk) is not None
 
     def get_town_by_chunk(self, bukkit_chunk):
         return self.claims_by_loc[bukkit_chunk.getX()].get(bukkit_chunk.getZ())
+
+    def player_town(self, uuid):
+        player_data = self.player_data.get_or_create(mage.uuid)
 
     def get_town_by_player_uuid(self, player_uuid):
         player_data = self.player_data.get(player_uuid)
@@ -128,9 +126,18 @@ class Towns(BasePlugin):
         # save town data
 
     def on_player_breaks_block(self, event, mage):
+        # if in town:
+        #     check_blockchange()
+        #     town.xp += 1
+        # else:
+        #     if server flag no_build:
+        #         "Building in wilderness is forbidden"
+        #     else:
+        #         "You can only alter blocks once every <proc[towns_get_setting].context[towns.world_edit_freq]> seconds outside of your town"
+        #         do the math
         block = event.getBlock()
         block_chunk = block.getLocation().getChunk()
-        town = self.get_town_by_chunk(block_chunk)
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(bukkit_chunk.getZ())
         if town:
             player_role = town.get_player_role(mage.uuid)
             print(player_role)
@@ -142,3 +149,49 @@ class Towns(BasePlugin):
           - run towns_checkunload_town def:<proc[towns_get_town].context[<def[value]>]>
         """
         pass
+
+    def check_blockchange(self, mage, town):
+        # if mage.has_role("admin")
+        pass
+
+        # if player has permission towns.override.build:
+        #     return True
+        # if town:
+        #   Town
+        #   if town == player_town:
+        #       ok
+
+        # else:
+        #   Wilderness
+
+
+"""
+  - if <def[location].exists.not> define location <context.location>
+  - define town <proc[towns_get_town_from_chunk].context[<def[location].chunk>]>
+  - if <player.has_permission[towns.override.build]||false> goto finish
+  - define player <player||null>
+  - if <def[town]> == null {
+    - define player_town Wilderness
+    } else {
+    - define player_town <def[town]>
+    }
+
+
+  - if <proc[towns_get_town].context[<player||null>]||null> == <def[player_town]> && <def[checkfor]||null> != pvp {
+    - goto finish
+    }
+  - if <player.has_flag[contrib]||false> && <proc[towns_get_members].context[<def[town]>].size> == 0 {
+    - goto finish
+    }
+  - if <def[checkfor].exists> {
+    - if <proc[towns_get_rule].context[<def[town]>|<def[checkfor]>]||false> goto finish
+    - if <player||false> != false {
+      - if <proc[towns_get_grant].context[<def[town]>|<def[checkfor]>|<player>]||false> goto finish
+      }
+    }
+  - if if <def[alert_player]||true> {
+    - narrate "<&c>You are not allowed to do this in the town of <proc[towns_get_name].context[<def[town]>]>" format:towns_format1
+    }
+  - determine cancelled
+  - mark finish
+"""

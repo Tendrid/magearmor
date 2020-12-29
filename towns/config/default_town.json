@@ -1,6 +1,7 @@
 {
     "name": "Village",
     "welcome": "Welcome to town",
+    "owner": "",
     "xp": 0,
     "ranks": [
         "Outsider",

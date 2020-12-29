@@ -5,6 +5,10 @@ from mcapi import SERVER
 from java.util import UUID
 
 
+SERVER_ROLE_ADMIN = "admin"
+SERVER_ROLE_MOD = "mod"
+
+
 class Mage(DataStorage):
     __inventory = None
     __player = None
@@ -24,6 +28,10 @@ class Mage(DataStorage):
         if self.__player is None:
             self.logoff()
         return self.__player
+
+    @property
+    def location(self):
+        return self.player.getLocation()
 
     @property
     def inventory(self):

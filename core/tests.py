@@ -3,7 +3,7 @@ from mcapi import SERVER
 import unittest
 from core.mageworld import MageWorld
 from core.storage import DataStorage, IndexStorage, BASE_DIR
-from mages import Mages
+import mages
 
 from org.bukkit import World
 import os
@@ -20,7 +20,7 @@ class TestMageWorld(unittest.TestCase):
 
     def test_mages_loaded(self):
         # mages is considered to be a required plugin
-        self.assertIsInstance(MageWorld.plugins.get("mages"), Mages)
+        self.assertIsInstance(MageWorld.plugins.get("mages"), mages.Plugin)
 
 
 class TestDataStorage(unittest.TestCase):

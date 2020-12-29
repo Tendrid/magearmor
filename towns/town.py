@@ -38,6 +38,7 @@ class Town(DataStorage):
         self.data["members"]["rank"] = rank
 
     def set_owner(self, mage):
+        self.data["owner"] = mage.uuid
         for uuid, member in self.data["members"].iteritems():
             if member["rank"] == TOWN_RANK_OWNER:
                 member["rank"] = TOWN_RANK_ADMIN
@@ -52,6 +53,3 @@ class Town(DataStorage):
     def add_chunk(self, x, z, world, plot_type, claimed_by_player):
         # x, z, world, plot_type, claimed_by_player
         self.data["chunks"].append((x, z, world, plot_type, claimed_by_player))
-
-    def save(self):
-        self.data

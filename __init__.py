@@ -1,4 +1,5 @@
 import os
+import logging
 from mcapi import *
 
 
@@ -6,51 +7,36 @@ path = os.path.abspath(os.path.join("python-plugins", "storage"))
 if not os.path.isdir(path):
     os.makedirs(path)
 
+
 from core.mageworld import MageWorld
+
+### Import Plugins #############################
 
 import battles
 import spells
 
-from mages import Mages
-from towns import Towns
+import mages
+import towns
 
-MageWorld.load_plugin(Mages)
-MageWorld.load_plugin(Towns)
-
-
-def claim_that_shit(player, command):
-    player_location = player.getLocation()
-    print("In claim func")
-    if MageWorld.plugins["towns"].is_claimed(player_location.getChunk()):
-        print("Already claimed")
-        return
-    player_uuid = str(player.getUniqueId())
-    MageWorld.plugins["towns"].claim(player_uuid)
+MageWorld.load_plugin(mages.Plugin)
+MageWorld.load_plugin(towns.Plugin)
 
 
-add_command("claim", claim_that_shit)
+### Import Commands #############################
+# from mages import commands
+from towns import commands
 
 
-print("~~~~~~~~~~~~~~~~~~~~~ Running MageArmor Tests ~~~~~~~~~~~~~~~~~~~~~")
+logging.info("~~~~~~~~~~~~~~~~~~~~~ Running MageArmor Tests ~~~~~~~~~~~~~~~~~~~~~")
+
 import unittest
+
 from core.tests import *
 from towns.tests import *
 from mages.tests import *
 
-suite = unittest.TestLoader()
-tests = [
-    TestMageWorld,
-    TestDataStorage,
-    TestIndexStorage,
-    TestTownFiles,
-    TestWilderness,
-    TestMageFiles,
-]
-test_runner = []
-for test in tests:
-    test_runner.append(suite.loadTestsFromTestCase(test))
-
-unittest.TextTestRunner(verbosity=2).run(unittest.TestSuite(test_runner))
-
-if False:
+test_program = unittest.main(verbosity=2, exit=False)
+logging.info("~~~~~~~~~~~~~~~~~~~~~~~~~~ Tests Complete ~~~~~~~~~~~~~~~~~~~~~~~~~~")
+if len(test_program.result.failures) > 0:
+    logging.error("Failed tests, shutting down server")
     SERVER.shutdown()

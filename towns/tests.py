@@ -1,37 +1,42 @@
 import unittest
 from mcapi import SERVER
 from core.mageworld import MageWorld
-from . import Towns
+from . import Plugin
 from town import Town
 from core.plugin import BasePlugin
+
+PLAYER_NOTCH = "069a79f4-44e9-4726-a5be-fca90e38aaf5"
+PLAYER_TENDRID = "0d909fe4-ddcf-4127-ba42-5e539a20ac2c"
+
+
+def activate_player(player_id):
+    test_players = {}
+    for player in SERVER.getOfflinePlayers():
+        test_players[str(player.getUniqueId())] = player
+    test_player = test_players[PLAYER_TENDRID]
+
+    MageWorld.mage_join(test_player)
+    test_mage = MageWorld.get_mage(PLAYER_TENDRID)
+    return test_mage
 
 
 class TestTownFiles(unittest.TestCase):
     def test_town_handler_loaded(self):
         # plugin has a valid name
-        self.assertNotEquals(Towns.lib_name, BasePlugin.lib_name)
+        self.assertNotEquals(Plugin.lib_name, BasePlugin.lib_name)
 
         # plugin has loaded
-        self.assertIsInstance(MageWorld.plugins[Towns.lib_name], Towns)
+        self.assertIsInstance(MageWorld.plugins[Plugin.lib_name], Plugin)
 
-        plugin = MageWorld.plugins[Towns.lib_name]
+        plugin = MageWorld.plugins[Plugin.lib_name]
 
         self.assertEquals(plugin.config_files, ("default_town", "wilderness", "config"))
 
     def test_town_id_from_mage(self):
-        tendrid_id = "0d909fe4-ddcf-4127-ba42-5e539a20ac2c"
-        test_players = {}
-        for player in SERVER.getOfflinePlayers():
-            test_players[str(player.getUniqueId())] = player
-        test_player = test_players[tendrid_id]
+        test_mage = activate_player(PLAYER_TENDRID)
+        self.assertEquals(str(test_mage.player.getUniqueId()), PLAYER_TENDRID)
 
-        self.assertEquals(str(test_player.getUniqueId()), tendrid_id)
-
-        MageWorld.mage_join(test_player)
-        test_mage = MageWorld.get_mage(tendrid_id)
-        self.assertEquals(test_mage.player, test_player)
-
-        plugin = MageWorld.plugins[Towns.lib_name]
+        plugin = MageWorld.plugins[Plugin.lib_name]
         plugin.load()
         town_obj = plugin.get_town_by_player_uuid(test_mage.uuid)
 
@@ -42,6 +47,8 @@ class TestTownFiles(unittest.TestCase):
         self.assertNotEquals(town_obj.uuid, None)
 
     def test_set_owner(self):
+        # check that town.owner == mage.uuid
+        # check that uuid in town.members, and rank is owner
         pass
 
     def test_add_member(self):
@@ -70,8 +77,8 @@ class TestTownFiles(unittest.TestCase):
 
 class TestWilderness(unittest.TestCase):
     def test_wilderness(self):
-        plugin = MageWorld.plugins[Towns.lib_name]
-        wilderness_config = MageWorld.get_config(Towns.lib_name, "wilderness")
+        plugin = MageWorld.plugins[Plugin.lib_name]
+        wilderness_config = MageWorld.get_config(Plugin.lib_name, "wilderness")
         self.assertIsInstance(plugin.wilderness, Town)
 
         self.assertEquals(plugin.wilderness.name, wilderness_config["name"])

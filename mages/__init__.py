@@ -5,7 +5,7 @@ from core.storage import IndexStorage
 from mage import Mage
 
 
-class Mages(BasePlugin):
+class Plugin(BasePlugin):
     lib_name = "mages"
     config_files = ("default_mage", "config")
 
