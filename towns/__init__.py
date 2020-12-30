@@ -10,6 +10,8 @@ import logging
 from collections import defaultdict
 from core.exceptions import PlayerErrorMessage
 
+from uuid import uuid4
+
 
 class Wilderness(Town):
     def __init__(self, *args, **kwargs):
@@ -25,8 +27,10 @@ class Wilderness(Town):
 class Plugin(BasePlugin):
     lib_name = "towns"
     config_files = ("default_town", "wilderness", "config")
-    claims_by_loc = defaultdict(dict)
     __wilderness = None
+
+    claims_by_loc = defaultdict(dict)
+    towns_by_player = {}
 
     @property
     def wilderness(self):
@@ -41,10 +45,7 @@ class Plugin(BasePlugin):
         player_data = self.player_data.get_or_create(mage.uuid)
 
     def get_town_by_player_uuid(self, player_uuid):
-        player_data = self.player_data.get(player_uuid)
-        if player_data.data.get("town"):
-            return self.towns.get(player_data.data.get("town"))
-        return None
+        return self.towns_by_player.get(player_uuid)
 
     def claim(self, mage, x, z, world_uuid):
         # check if claim already owned
@@ -59,7 +60,11 @@ class Plugin(BasePlugin):
 
         player_town = self.get_town_by_player_uuid(mage.uuid)
         if not player_town:
-            raise PlayerErrorMessage("You're not in a town!")
+            raise PlayerErrorMessage(
+                "You havent started a town yet!  Please use /{} create".format(
+                    self.lib_name
+                )
+            )
 
         town = self.get_town_by_player_uuid(mage.uuid)
 
@@ -70,15 +75,24 @@ class Plugin(BasePlugin):
             town.set_owner(mage)
 
         town.add_chunk(
-            int(x),
-            int(z),
-            str(world_uuid),
-            plot_type,
-            player_uuid,
+            int(x), int(z), str(world_uuid), plot_type, player_uuid,
         )
 
         self.claims_by_loc[x][z] = town
         self.towns.get(town.uuid).save()
+
+    def create_town(self, mage):
+        player_town = self.get_town_by_player_uuid(mage.uuid)
+        if player_town:
+            raise PlayerErrorMessage(
+                "You're already the owner of {}".format(player_town.name)
+            )
+
+        town = self.towns.add(str(uuid4()))
+        town.set_owner(mage)
+        town.save()
+        self.towns_by_player[mage.uuid] = town
+        return town
 
     # def on_load_config(self):
     #     towns_default = MageWorld.get_config(self.lib_name, "towns_default")
@@ -89,6 +103,7 @@ class Plugin(BasePlugin):
         self.player_data = IndexStorage(self.lib_name, "players")
         self.towns = IndexStorage(self.lib_name, "towns", Town)
         for town_uuid, town in self.towns:
+            self.towns_by_player[town.data["owner"]] = town
             for chunk in town.data.get("chunks"):
                 self.claims_by_loc[chunk[0]][chunk[1]] = town
         # run towns_fix_cuboids

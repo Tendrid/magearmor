@@ -1,23 +1,22 @@
 import unittest
 from mcapi import SERVER
+from java.util import UUID
+
 from core.mageworld import MageWorld
 from . import Plugin
 from town import Town
 from core.plugin import BasePlugin
+
+from core.exceptions import PlayerErrorMessage
 
 PLAYER_NOTCH = "069a79f4-44e9-4726-a5be-fca90e38aaf5"
 PLAYER_TENDRID = "0d909fe4-ddcf-4127-ba42-5e539a20ac2c"
 
 
 def activate_player(player_id):
-    test_players = {}
-    for player in SERVER.getOfflinePlayers():
-        test_players[str(player.getUniqueId())] = player
-    test_player = test_players[PLAYER_TENDRID]
-
+    test_player = SERVER.getOfflinePlayer(UUID.fromString(player_id))
     MageWorld.mage_join(test_player)
-    test_mage = MageWorld.get_mage(PLAYER_TENDRID)
-    return test_mage
+    return MageWorld.get_mage(player_id)
 
 
 class TestTownFiles(unittest.TestCase):
@@ -33,12 +32,12 @@ class TestTownFiles(unittest.TestCase):
         self.assertEquals(plugin.config_files, ("default_town", "wilderness", "config"))
 
     def test_town_id_from_mage(self):
-        test_mage = activate_player(PLAYER_TENDRID)
-        self.assertEquals(str(test_mage.player.getUniqueId()), PLAYER_TENDRID)
+        mage = activate_player(PLAYER_TENDRID)
+        self.assertEquals(str(mage.player.getUniqueId()), PLAYER_TENDRID)
 
         plugin = MageWorld.plugins[Plugin.lib_name]
         plugin.load()
-        town_obj = plugin.get_town_by_player_uuid(test_mage.uuid)
+        town_obj = plugin.get_town_by_player_uuid(mage.uuid)
 
         self.assertNotEquals(town_obj, None)
 
@@ -47,8 +46,26 @@ class TestTownFiles(unittest.TestCase):
         self.assertNotEquals(town_obj.uuid, None)
 
     def test_set_owner(self):
-        test_mage = activate_player(PLAYER_NOTCH)
+        mage = activate_player(PLAYER_NOTCH)
         plugin = MageWorld.plugins[Plugin.lib_name]
+
+        self.assertEquals(plugin.get_town_by_player_uuid(mage.uuid), None)
+
+        # Fail claim when not an owner
+        with self.assertRaises(PlayerErrorMessage) as claim_exception:
+            plugin.claim(mage, 0, 0, "SOME WORLD ID")
+        self.assertEquals(
+            claim_exception.exception.message,
+            "This plot is already clamed by Sanctuary",
+        )
+
+        town = plugin.create_town(mage)
+        with self.assertRaises(PlayerErrorMessage) as create_exception:
+            town.set_name("this town name is far too long and should not be allowed")
+        self.assertEquals(
+            create_exception.exception.message,
+            "That name is too long!  Please keep town names under 32 characters",
+        )
 
         # claimed_by = plugin.get_town_by_coords(bukkit_chunk.getX(), bukkit_chunk.getZ())
 

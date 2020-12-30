@@ -1,6 +1,8 @@
 from core.mageworld import MageWorld
-import copy
+from core.exceptions import PlayerErrorMessage
 from core.storage import DataStorage
+
+import copy
 
 TOWN_CLAIM_TYPE_CENTER = 0
 TOWN_CLAIM_TYPE_NORMAL = 1
@@ -12,8 +14,7 @@ TOWN_RANK_MEMBER = 3
 
 from uuid import uuid4
 
-TOWN_WELCOME = "Welcome to town"
-TOWN_NAME = "Village"
+MAX_TOWN_NAME_LENGTH = 32
 
 
 class Town(DataStorage):
@@ -24,7 +25,7 @@ class Town(DataStorage):
     @property
     def welcome(self):
         if self.get_rule("titlescreen"):
-            return self.data.get("welcome", TOWN_WELCOME)
+            return self.data.get("welcome", "")
 
     def set_data(self, data):
         # set town defaults
@@ -43,6 +44,15 @@ class Town(DataStorage):
             if member["rank"] == TOWN_RANK_OWNER:
                 member["rank"] = TOWN_RANK_ADMIN
         self.set_member_rank(mage, TOWN_RANK_OWNER)
+
+    def set_name(self, name):
+        if len(name) > MAX_TOWN_NAME_LENGTH:
+            raise PlayerErrorMessage(
+                "That name is too long!  Please keep town names under {} characters".format(
+                    MAX_TOWN_NAME_LENGTH
+                )
+            )
+        self.data["name"] = name
 
     def get_rule(self, rule_name):
         return self.data["rule"].get(rule_name)

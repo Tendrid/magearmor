@@ -37,6 +37,6 @@ from mages.tests import *
 
 test_program = unittest.main(verbosity=2, exit=False)
 logging.info("~~~~~~~~~~~~~~~~~~~~~~~~~~ Tests Complete ~~~~~~~~~~~~~~~~~~~~~~~~~~")
-if len(test_program.result.failures) > 0:
+if not test_program.result.wasSuccessful():
     logging.error("Failed tests, shutting down server")
     SERVER.shutdown()
