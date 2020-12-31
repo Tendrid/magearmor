@@ -149,9 +149,25 @@ class TestTownFiles(unittest.TestCase):
             "You can only claim adjacent chunks to your town",
         )
 
-        # claim attached plot
+        # claim attached plot (2nd claim)
         plugin.claim(mage, CLAIM_X, CLAIM_Z + 1, "00000000-0000-0000-0000-000000000000")
         self.assertEquals(plugin.get_town_by_coords(10000, 10001), TestTownFiles.town)
+
+        # claim 7 more plots
+        for i in range(1, 8):
+            plugin.claim(
+                mage, CLAIM_X + i, CLAIM_Z, "00000000-0000-0000-0000-000000000000"
+            )
+
+        # try to claim too many plots
+        with self.assertRaises(PlayerErrorMessage) as claim_exception:
+            plugin.claim(
+                mage, CLAIM_X, CLAIM_Z - 1, "00000000-0000-0000-0000-000000000000"
+            )
+        self.assertEquals(
+            claim_exception.exception.message,
+            "Your town can only have up to 9 plots right now",
+        )
 
     def test_b4_add_member(self):
         pass

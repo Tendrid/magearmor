@@ -61,7 +61,8 @@ class Plugin(BasePlugin):
         if not town:
             town = self.create_town(mage)
 
-        if plot_type == TOWN_CLAIM_TYPE_NORMAL and len(town.data["chunks"]) > 0:
+        chunk_count = len(town.data["chunks"])
+        if plot_type == TOWN_CLAIM_TYPE_NORMAL and chunk_count > 0:
             # check surrounding plots
             surrounding_pattern = [(-1, 0), (0, 1), (1, 0), (0, -1)]
             claim_fail = True
@@ -74,6 +75,15 @@ class Plugin(BasePlugin):
                 raise PlayerErrorMessage(
                     "You can only claim adjacent chunks to your town"
                 )
+        base_claim_count = MageWorld.get_config(self.lib_name, "config")[
+            "base_claim_count"
+        ]
+        if chunk_count >= (town.data["bonus_chunks"] + base_claim_count):
+            raise PlayerErrorMessage(
+                "Your town can only have up to {} plots right now".format(
+                    town.data["bonus_chunks"] + base_claim_count
+                )
+            )
 
         town.add_chunk(
             int(x), int(z), str(world_uuid), plot_type, mage.uuid,

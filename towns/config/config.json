@@ -2,6 +2,7 @@
     "use_dynmap": false,
     "language": "english",
     "world_edit_freq": 5,
+    "base_claim_count": 9,
     "claiming": {
         "claiming_cost": 100,
         "outpost_claiming_cost": 400
