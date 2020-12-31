@@ -28,7 +28,6 @@ from towns import commands
 
 
 logging.info("~~~~~~~~~~~~~~~~~~~~~ Running MageArmor Tests ~~~~~~~~~~~~~~~~~~~~~")
-
 import unittest
 
 from core.tests import *

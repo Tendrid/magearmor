@@ -68,6 +68,15 @@ class IndexStorage(object):
         self.files[key].save()
         return self.files[key]
 
+    def remove(self, key):
+        if self.files.get(key):
+            del self.files[key]
+            file_path = os.path.join(self.path, "{}.json".format(key))
+            new_file_path = os.path.join(self.path, "{}.removed".format(key))
+            os.rename(file_path, new_file_path)
+        else:
+            raise ValueError("Unknown Town: {}".format(key))
+
     def get_or_create(self, key):
         if self.files.get(key) is None:
             file_path = os.path.join(self.path, "{}.json".format(key))

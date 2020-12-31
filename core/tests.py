@@ -43,12 +43,12 @@ class TestDataStorage(unittest.TestCase):
 
 
 class TestIndexStorage(unittest.TestCase):
-    def test_create_dir(self):
+    def test_a_create_dir(self):
         path = os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB, "test_a"))))
         store = IndexStorage(TEST_LIB, "test_a")
         self.assertTrue(os.path.isdir(path))
 
-    def test_create_file(self):
+    def test_b_create_file(self):
         store = IndexStorage(TEST_LIB, "test_a")
         path = os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB, "test_a"))))
 
@@ -64,7 +64,7 @@ class TestIndexStorage(unittest.TestCase):
 
         self.assertTrue(os.path.isfile("{}/file1.json".format(path)))
 
-    def test_read_check(self):
+    def test_c_read_check(self):
         store = IndexStorage(TEST_LIB, "test_a")
         test_file = store.get("file1")
         self.assertEquals(test_file.data["number"], 12)
@@ -72,6 +72,13 @@ class TestIndexStorage(unittest.TestCase):
         self.assertEquals(test_file.data["list"], ["a", "b", "c"])
         self.assertEquals(test_file.data["dict"]["more"], "data")
         self.assertEquals(test_file.data["bool"], True)
+
+    def test_d_remove_file(self):
+        store = IndexStorage(TEST_LIB, "test_a")
+        store.remove("file1")
+        path = os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB, "test_a"))))
+        self.assertFalse(os.path.isfile("{}/file1.json".format(path)))
+        self.assertTrue(os.path.isfile("{}/file1.removed".format(path)))
 
     @classmethod
     def tearDownClass(cls):

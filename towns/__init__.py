@@ -2,7 +2,7 @@ from mcapi import asynchronous, synchronous
 from core.mageworld import MageWorld
 from core.plugin import BasePlugin, PluginData
 
-from town import Town, TOWN_CLAIM_TYPE_CENTER, TOWN_CLAIM_TYPE_NORMAL
+from town import Town, TOWN_CLAIM_TYPE_NORMAL
 
 from core.storage import IndexStorage
 
@@ -47,10 +47,9 @@ class Plugin(BasePlugin):
     def get_town_by_player_uuid(self, player_uuid):
         return self.towns_by_player.get(player_uuid)
 
-    def claim(self, mage, x, z, world_uuid):
+    def claim(self, mage, x, z, world_uuid, plot_type=TOWN_CLAIM_TYPE_NORMAL):
         # check if claim already owned
         # check if player is in town
-        # if player in town. claim type TOWN_CLAIM_TYPE_NORMAL, else TOWN_CLAIM_TYPE_CENTER
 
         claimed_by = self.get_town_by_coords(x, z)
         if claimed_by:
@@ -58,24 +57,26 @@ class Plugin(BasePlugin):
                 "This plot is already clamed by {}".format(claimed_by.name)
             )
 
-        player_town = self.get_town_by_player_uuid(mage.uuid)
-        if not player_town:
-            raise PlayerErrorMessage(
-                "You havent started a town yet!  Please use /{} create".format(
-                    self.lib_name
-                )
-            )
-
         town = self.get_town_by_player_uuid(mage.uuid)
-
-        plot_type = TOWN_CLAIM_TYPE_NORMAL
         if not town:
-            ref = self.towns.add(town.uuid)
-            plot_type = TOWN_CLAIM_TYPE_CENTER
-            town.set_owner(mage)
+            town = self.create_town(mage)
+
+        if plot_type == TOWN_CLAIM_TYPE_NORMAL and len(town.data["chunks"]) > 0:
+            # check surrounding plots
+            surrounding_pattern = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+            claim_fail = True
+            for _x, _z in surrounding_pattern:
+                town_check = self.get_town_by_coords(x + _x, z + _z)
+                if town_check == town:
+                    claim_fail = False
+
+            if claim_fail:
+                raise PlayerErrorMessage(
+                    "You can only claim adjacent chunks to your town"
+                )
 
         town.add_chunk(
-            int(x), int(z), str(world_uuid), plot_type, player_uuid,
+            int(x), int(z), str(world_uuid), plot_type, mage.uuid,
         )
 
         self.claims_by_loc[x][z] = town
@@ -93,6 +94,9 @@ class Plugin(BasePlugin):
         town.save()
         self.towns_by_player[mage.uuid] = town
         return town
+
+    def remove_town(self, uuid):
+        self.towns.remove(uuid)
 
     # def on_load_config(self):
     #     towns_default = MageWorld.get_config(self.lib_name, "towns_default")

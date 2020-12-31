@@ -1,4 +1,5 @@
 import unittest
+import os
 from mcapi import SERVER
 from java.util import UUID
 
@@ -20,7 +21,7 @@ def activate_player(player_id):
 
 
 class TestTownFiles(unittest.TestCase):
-    def test_town_handler_loaded(self):
+    def test_a1_town_handler_loaded(self):
         # plugin has a valid name
         self.assertNotEquals(Plugin.lib_name, BasePlugin.lib_name)
 
@@ -45,56 +46,124 @@ class TestTownFiles(unittest.TestCase):
 
         self.assertNotEquals(town_obj.uuid, None)
 
-    def test_set_owner(self):
+    def test_b1_town_create(self):
         mage = activate_player(PLAYER_NOTCH)
         plugin = MageWorld.plugins[Plugin.lib_name]
 
+        # make sure player does not own a town
         self.assertEquals(plugin.get_town_by_player_uuid(mage.uuid), None)
 
         # Fail claim when not an owner
         with self.assertRaises(PlayerErrorMessage) as claim_exception:
-            plugin.claim(mage, 0, 0, "SOME WORLD ID")
+            # XXX TODO: currently, there is no check against world ID for towns.
+            plugin.claim(mage, 0, 0, "00000000-0000-0000-0000-000000000000")
         self.assertEquals(
             claim_exception.exception.message,
             "This plot is already clamed by Sanctuary",
         )
 
-        town = plugin.create_town(mage)
+        # create a new town
+        TestTownFiles.town = plugin.create_town(mage)
+
+        self.assertEquals(TestTownFiles.town.data["owner"], PLAYER_NOTCH)
+
+        # claimed_by = plugin.get_town_by_coords(bukkit_chunk.getX(), bukkit_chunk.getZ())
+
+        # check that uuid in town.members, and rank is owner
+
+    def test_b2_town_name(self):
         with self.assertRaises(PlayerErrorMessage) as create_exception:
-            town.set_name("this town name is far too long and should not be allowed")
+            TestTownFiles.town.set_name(
+                "this town name is far too long and should not be allowed"
+            )
+
+        # check name is too long
         self.assertEquals(
             create_exception.exception.message,
             "That name is too long!  Please keep town names under 32 characters",
         )
 
-        # claimed_by = plugin.get_town_by_coords(bukkit_chunk.getX(), bukkit_chunk.getZ())
+        TestTownFiles.town.set_name("Notchville")
+        self.assertEquals(TestTownFiles.town.data["name"], "Notchville")
 
-        # check that town.owner == mage.uuid
-        # check that uuid in town.members, and rank is owner
-        pass
+    def test_b3_claim(self):
+        plugin = MageWorld.plugins[Plugin.lib_name]
+        mage = MageWorld.get_mage(PLAYER_NOTCH)
 
-    def test_add_member(self):
-        pass
+        # check no claims in town
+        self.assertEquals(len(TestTownFiles.town.data["chunks"]), 0)
 
-    def test_create_town(self):
-        pass
-        # claim chunk, and create new town
-        # check town is created
-        # check only one claim in town
-        # check claim in town is type center
+        CLAIM_X = 10000
+        CLAIM_Z = 10000
+        # claim plot
+        plugin.claim(mage, CLAIM_X, CLAIM_Z, "00000000-0000-0000-0000-000000000000")
 
-    def test_chunk_claimed(self):
+        self.assertEquals(len(TestTownFiles.town.data["chunks"]), 1)
+        self.assertEquals(plugin.get_town_by_coords(10000, 10000), TestTownFiles.town)
+
         # test failure of claiming a chunk that is already claimed
+        with self.assertRaises(PlayerErrorMessage) as claim_exception:
+            plugin.claim(mage, CLAIM_X, CLAIM_Z, "00000000-0000-0000-0000-000000000000")
+        self.assertEquals(
+            claim_exception.exception.message,
+            "This plot is already clamed by Notchville",
+        )
+
+        # fail on corner chunks
+        # top left
+        with self.assertRaises(PlayerErrorMessage) as claim_exception:
+            plugin.claim(
+                mage, CLAIM_X - 1, CLAIM_Z - 1, "00000000-0000-0000-0000-000000000000"
+            )
+        self.assertEquals(
+            claim_exception.exception.message,
+            "You can only claim adjacent chunks to your town",
+        )
+
+        # top right
+        with self.assertRaises(PlayerErrorMessage) as claim_exception:
+            plugin.claim(
+                mage, CLAIM_X - 1, CLAIM_Z + 1, "00000000-0000-0000-0000-000000000000"
+            )
+        self.assertEquals(
+            claim_exception.exception.message,
+            "You can only claim adjacent chunks to your town",
+        )
+
+        # bottom right
+        with self.assertRaises(PlayerErrorMessage) as claim_exception:
+            plugin.claim(
+                mage, CLAIM_X + 1, CLAIM_Z + 1, "00000000-0000-0000-0000-000000000000"
+            )
+        self.assertEquals(
+            claim_exception.exception.message,
+            "You can only claim adjacent chunks to your town",
+        )
+
+        with self.assertRaises(PlayerErrorMessage) as claim_exception:
+            plugin.claim(
+                mage, CLAIM_X - 1, CLAIM_Z + 1, "00000000-0000-0000-0000-000000000000"
+            )
+        self.assertEquals(
+            claim_exception.exception.message,
+            "You can only claim adjacent chunks to your town",
+        )
+
+        # claim attached plot
+        plugin.claim(mage, CLAIM_X, CLAIM_Z + 1, "00000000-0000-0000-0000-000000000000")
+        self.assertEquals(plugin.get_town_by_coords(10000, 10001), TestTownFiles.town)
+
+    def test_b4_add_member(self):
         pass
 
-    def test_claim_available_chunk(self):
-        # test claim a chunk in an already created town
-        pass
+    def test_z_remove_town(self):
+        MageWorld.plugins[Plugin.lib_name].remove_town(TestTownFiles.town.uuid)
 
-    def test_claim_chunk_not_connected(self):
-        pass
-        # claim chunk not connected, and fail
-        # claim outpost not connected and pass
+    @classmethod
+    def tearDownClass(cls):
+        # clean up test town
+        if TestTownFiles.town:
+            os.remove(TestTownFiles.town.path.replace(".json", ".removed"))
 
 
 class TestWilderness(unittest.TestCase):
