@@ -10,7 +10,7 @@ from org.bukkit.event.player import PlayerJoinEvent
 from org.bukkit.event.server import ServerCommandEvent
 from org.bukkit.event import EventPriority
 
-
+"""
 class Mage(object):
     player = None
     __inventory = None
@@ -36,6 +36,7 @@ class Mage(object):
         if not self.__uuid:
             self.__uuid = str(self.player.getUniqueId())
         return self.__uuid
+"""
 
 
 class EventListener(Listener):
@@ -81,11 +82,11 @@ class WorldInstance(object):
         return listener
 
     def get_mage(self, player_id):
-        return self.plugins["mages"].mages.get_or_create(player_id)
+        return self.plugins["mages"].mages.get(player_id)
 
-    def mage_join(self, player):
-        mage = Mage(player)
-        self.players[str(player.getUniqueId())] = mage
+    def mage_join(self, player_uuid):
+        mage = self.plugins["mages"].mages.get_or_create(player_uuid)
+        self.players[player_uuid] = mage
         return mage
 
     """

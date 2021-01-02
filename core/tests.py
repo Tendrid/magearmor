@@ -28,6 +28,9 @@ class TestMageWorld(unittest.TestCase):
         # mages is considered to be a required plugin
         self.assertIsInstance(MageWorld.plugins.get("mages"), mages.Plugin)
 
+    def test_no_mage(self):
+        self.assertEquals(MageWorld.get_mage("invalid-mage-uuid"), None)
+
 
 class TestDataStorage(unittest.TestCase):
     def test_create_file(self):

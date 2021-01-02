@@ -32,6 +32,6 @@ class TestMageFiles(unittest.TestCase):
 
         self.assertEquals(str(test_player.getUniqueId()), tendrid_id)
 
-        MageWorld.mage_join(test_player)
+        MageWorld.mage_join(tendrid_id)
         test_mage = MageWorld.get_mage(tendrid_id)
         self.assertEquals(test_mage.player, test_player)

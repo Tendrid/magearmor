@@ -1,23 +1,15 @@
 import unittest
 import os
-from mcapi import SERVER
-from java.util import UUID
 
 from core.mageworld import MageWorld
 from . import Plugin
-from town import Town
+from town import Town, TOWN_RANK_OWNER
 from core.plugin import BasePlugin
 from core.storage import BASE_DIR
 from core.exceptions import PlayerErrorMessage
 
 PLAYER_NOTCH = "069a79f4-44e9-4726-a5be-fca90e38aaf5"
 PLAYER_TENDRID = "0d909fe4-ddcf-4127-ba42-5e539a20ac2c"
-
-
-def activate_player(player_id):
-    test_player = SERVER.getOfflinePlayer(UUID.fromString(player_id))
-    MageWorld.mage_join(test_player)
-    return MageWorld.get_mage(player_id)
 
 
 class TestTownPermissions(unittest.TestCase):
@@ -65,7 +57,8 @@ class TestTownFiles(unittest.TestCase):
         os.remove(mage_town.path)
 
     def test_town_id_from_mage(self):
-        mage = activate_player(PLAYER_TENDRID)
+        mage = MageWorld.mage_join(PLAYER_TENDRID)
+
         self.assertEquals(str(mage.player.getUniqueId()), PLAYER_TENDRID)
 
         plugin = MageWorld.plugins[Plugin.lib_name]
@@ -79,7 +72,8 @@ class TestTownFiles(unittest.TestCase):
         self.assertNotEquals(town_obj.uuid, None)
 
     def test_b1_town_create(self):
-        mage = activate_player(PLAYER_NOTCH)
+        mage = MageWorld.mage_join(PLAYER_NOTCH)
+
         plugin = MageWorld.plugins[Plugin.lib_name]
 
         # make sure player does not own a town
@@ -97,11 +91,14 @@ class TestTownFiles(unittest.TestCase):
         # create a new town
         TestTownFiles.town = plugin.create_town(mage)
 
-        # check that uuid in town.members
+        self.assertEquals(len(TestTownFiles.town.data["members"].keys()), 0)
+
+        # check that mage is owner
         self.assertEquals(TestTownFiles.town.data["owner"], PLAYER_NOTCH)
 
-        # and rank is owner
-        # todo (fix town members, so owner isnt a member, but mixin town.get_members from owner)
+        self.assertEquals(
+            TestTownFiles.town.get_player_rank(PLAYER_NOTCH), TOWN_RANK_OWNER
+        )
 
     def test_b2_town_name(self):
         with self.assertRaises(PlayerErrorMessage) as create_exception:
@@ -209,9 +206,23 @@ class TestTownFiles(unittest.TestCase):
         self.assertEquals(plugin.get_town_by_coords(CLAIM_X, CLAIM_Z), None)
 
     def test_b4_add_member(self):
-        # add member
-        # set member rank
-        pass
+        mage = MageWorld.mage_join(PLAYER_TENDRID)
+        # print(TestTownFiles.town.data["members"])
+        self.assertEquals(len(TestTownFiles.town.data["members"].keys()), 0)
+
+        TestTownFiles.town.add_member(mage)
+        self.assertEquals(len(TestTownFiles.town.data["members"].keys()), 1)
+        self.assertEquals(TestTownFiles.town.get_player_rank(mage.uuid), 1)
+
+        TestTownFiles.town.set_member_rank(mage, TestTownFiles.town.ranks[3])
+        self.assertEquals(TestTownFiles.town.get_player_rank(mage.uuid), 3)
+
+        with self.assertRaises(PlayerErrorMessage) as rank_exception:
+            TestTownFiles.town.set_member_rank(mage, TestTownFiles.town.ranks[4])
+        self.assertEquals(
+            rank_exception.exception.message,
+            "You cannot assign the rank of {}".format(TestTownFiles.town.ranks[4]),
+        )
 
     def test_z_remove_town(self):
         MageWorld.plugins[Plugin.lib_name].remove_town(TestTownFiles.town.uuid)

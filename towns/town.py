@@ -53,7 +53,7 @@ class Town(DataStorage):
                 v.update(self.data[k])
                 self.data[k] = v
 
-    def add_memeber(self, mage):
+    def add_member(self, mage):
         if self.data["members"].get(mage.uuid):
             raise PlayerErrorMessage(
                 "{} is already a member of {}".format(mage.name, self.name)
@@ -99,7 +99,7 @@ class Town(DataStorage):
                 "You cannot assign the rank of {}".format(rank_name)
             )
 
-        self.data["members"]["rank"] = rank_idx
+        self.data["members"][mage.uuid]["rank"] = rank_idx
         self.save()
 
     def set_owner(self, mage):
@@ -107,8 +107,9 @@ class Town(DataStorage):
 
         self.data["owner"] = mage.uuid
         if old_owner:
-            self.add_memeber(old_owner)
-            self.set_member_rank(old_owner, self.ranks[TOWN_RANK_OWNER - 1])
+            print("OLDER OWNER", old_owner.data)
+            self.add_member(old_owner)
+            # self.set_member_rank(old_owner, self.ranks[TOWN_RANK_OWNER - 1])
 
         if self.data["members"].get(mage.uuid):
             self.remove_member(mage)
