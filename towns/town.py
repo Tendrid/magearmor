@@ -107,7 +107,6 @@ class Town(DataStorage):
 
         self.data["owner"] = mage.uuid
         if old_owner:
-            print("OLDER OWNER", old_owner.data)
             self.add_member(old_owner)
             # self.set_member_rank(old_owner, self.ranks[TOWN_RANK_OWNER - 1])
 

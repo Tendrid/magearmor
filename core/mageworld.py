@@ -84,6 +84,13 @@ class WorldInstance(object):
     def get_mage(self, player_id):
         return self.plugins["mages"].mages.get(player_id)
 
+    def get_mage_by_name(self, player_name):
+        mages = self.plugins["mages"].mages.get_by("name", player_name)
+        if mages:
+            return mages[0]
+        else:
+            return None
+
     def mage_join(self, player_uuid):
         mage = self.plugins["mages"].mages.get_or_create(player_uuid)
         self.players[player_uuid] = mage

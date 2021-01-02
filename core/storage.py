@@ -64,6 +64,13 @@ class IndexStorage(object):
                 self.files[key] = self.storage_module(key, file_path)
         return self.files.get(key)
 
+    def get_by(self, attr, key):
+        ret_val = []
+        for ds in self.files.values():
+            if ds.data.get(attr) == key:
+                ret_val.append(ds)
+        return ret_val
+
     def add(self, key, data=None):
         if data is None:
             data = {}

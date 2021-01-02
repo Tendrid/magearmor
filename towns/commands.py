@@ -74,3 +74,20 @@ def command_ranks(mage, command):
         mage.player.sendMessage("{} renamed to {}".format(command[0], command[1]))
     else:
         raise PlayerErrorMessage("use /towns-rank <rank_name> <new_rank_name>")
+
+
+@register_command(Plugin.lib_name, "add-member")
+def command_add_member(mage, command):
+    town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
+    if not town:
+        raise PlayerErrorMessage("You do not own a town")
+
+    if len(command) != 1:
+        raise PlayerErrorMessage("use /towns-add-member <playername>")
+    else:
+        new_member = MageWorld.get_mage_by_name(command[0])
+        if not new_member:
+            raise PlayerErrorMessage("Unknown Player {}".format(command[0]))
+        else:
+            town.add_member(new_member)
+            mage.player.sendMessage("{} added to {}".format(command[0], town.name))

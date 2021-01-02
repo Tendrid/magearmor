@@ -82,6 +82,11 @@ class TestIndexStorage(unittest.TestCase):
         self.assertEquals(test_file.data["dict"]["more"], "data")
         self.assertEquals(test_file.data["bool"], True)
 
+        self.assertEquals(store.get_by("number", 12)[0], test_file)
+        self.assertEquals(len(store.get_by("number", "12")), 0)
+
+        self.assertEquals(store.get_by("string", "here is my string")[0], test_file)
+
     def test_d_remove_file(self):
         store = IndexStorage(TEST_LIB, "test_a")
         store.remove("file1")
