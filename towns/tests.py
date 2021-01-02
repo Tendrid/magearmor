@@ -46,9 +46,9 @@ class TestTownFiles(unittest.TestCase):
         town = Town(
             "towns", "{}/00000000-0000-0000-0000-000000000001.json".format(path), {},
         )
-        town.data["permissions"] = {"unknown": "permission"}
+        town.data["permissions"] = {"unknown": "permission", "build": 99}
         town.save()
-        self.assertEquals(len(town.data["permissions"].keys()), 1)
+        self.assertEquals(len(town.data["permissions"].keys()), 2)
 
         # load the town properly, and make sure the defaults are in there
         mage_town = plugin.towns.get("00000000-0000-0000-0000-000000000001")
@@ -58,6 +58,9 @@ class TestTownFiles(unittest.TestCase):
             len(mage_town.data["permissions"].keys()),
             len(default_data["permissions"].keys()) + 1,
         )
+
+        self.assertEquals(mage_town.data["permissions"]["unknown"], "permission")
+        self.assertEquals(mage_town.data["permissions"]["build"], 99)
 
         os.remove(mage_town.path)
 

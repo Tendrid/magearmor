@@ -37,7 +37,8 @@ class Town(DataStorage):
             if not self.data.get(k):
                 self.data[k] = v
             elif type(self.data[k]) is dict:
-                self.data[k].update(v)
+                v.update(self.data[k])
+                self.data[k] = v
 
     def set_member_rank(self, mage, rank):
         if self.data["members"].get(mage.uuid) is None:
