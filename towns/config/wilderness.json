@@ -1,6 +1,5 @@
 {
     "name": "Wilderness",
-    "welcome": "It's dangerous to go alone",
     "permissions": {
         "pve":0,
         "build": 1,
