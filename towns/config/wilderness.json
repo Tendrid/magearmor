@@ -3,7 +3,7 @@
     "welcome": "It's dangerous to go alone",
     "permissions": {
         "pve":0,
-        "build": 0,
+        "build": 1,
         "doors": 0,
         "chests": 0,
         "buttons": 0,

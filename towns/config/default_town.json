@@ -7,8 +7,7 @@
         "Outsider",
         "Peasant",
         "Citizen",
-        "Leader",
-        "Admin",
+        "Lord",
         "Owner"
     ],
     "bonus_outposts": 0,
@@ -20,8 +19,8 @@
         "build": 3,
         "doors": 0,
         "chests": 2,
-        "buttons": 0,
-        "switches": 0,
+        "buttons": 1,
+        "switches": 1,
         "plates": 0
     },
     "members": {},

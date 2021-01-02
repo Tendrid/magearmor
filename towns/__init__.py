@@ -89,6 +89,19 @@ class Plugin(BasePlugin):
         self.claims_by_loc[x][z] = town
         self.towns.get(town.uuid).save()
 
+    def unclaim(self, mage, x, z, world_uuid):
+        claimed_by = self.get_town_by_coords(x, z)
+        if not claimed_by:
+            raise PlayerErrorMessage("This plot not clamed")
+        town = self.get_town_by_player_uuid(mage.uuid)
+        if town != claimed_by:
+            raise PlayerErrorMessage("You do not have permission to unclaim this plot")
+
+        town.remove_chunk(int(x), int(z), str(world_uuid))
+
+        del self.claims_by_loc[x][z]
+        self.towns.get(town.uuid).save()
+
     def create_town(self, mage):
         player_town = self.get_town_by_player_uuid(mage.uuid)
         if player_town:
@@ -190,8 +203,6 @@ class Plugin(BasePlugin):
     def check_town_permission(self, mage, town, permission):
         # config = MageWorld.get_config(self.lib_name, "config")
         # if mage.has_role("admin")
-        print(town.data["permissions"])
-        print(town.get_player_role(mage.uuid), town.data["permissions"].get(permission))
         return town.get_player_role(mage.uuid) >= town.data["permissions"].get(
             permission, 9
         )

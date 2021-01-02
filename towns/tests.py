@@ -131,7 +131,9 @@ class TestTownFiles(unittest.TestCase):
         plugin.claim(mage, CLAIM_X, CLAIM_Z, "00000000-0000-0000-0000-000000000000")
 
         self.assertEquals(len(TestTownFiles.town.data["chunks"]), 1)
-        self.assertEquals(plugin.get_town_by_coords(10000, 10000), TestTownFiles.town)
+        self.assertEquals(
+            plugin.get_town_by_coords(CLAIM_X, CLAIM_Z), TestTownFiles.town
+        )
 
         # test failure of claiming a chunk that is already claimed
         with self.assertRaises(PlayerErrorMessage) as claim_exception:
@@ -201,7 +203,14 @@ class TestTownFiles(unittest.TestCase):
             "Your town can only have up to 9 plots right now",
         )
 
+        self.assertEquals(len(TestTownFiles.town.data["chunks"]), 9)
+        plugin.unclaim(mage, CLAIM_X, CLAIM_Z, "00000000-0000-0000-0000-000000000000")
+        self.assertEquals(len(TestTownFiles.town.data["chunks"]), 8)
+        self.assertEquals(plugin.get_town_by_coords(CLAIM_X, CLAIM_Z), None)
+
     def test_b4_add_member(self):
+        # add member
+        # set member rank
         pass
 
     def test_z_remove_town(self):

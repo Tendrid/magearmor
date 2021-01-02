@@ -30,6 +30,10 @@ class Mage(DataStorage):
         return self.__player
 
     @property
+    def name(self):
+        return self.player.name
+
+    @property
     def location(self):
         return self.player.getLocation()
 
