@@ -25,3 +25,13 @@ def command_unclaim(mage, command):
 @register_command(Plugin.lib_name, "create")
 def command_create(mage, command):
     MageWorld.plugins["towns"].create_town(mage)
+
+
+@register_command(Plugin.lib_name, "name")
+def command_create(mage, command):
+    town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
+    if not town:
+        raise PlayerErrorMessage("You must make a town before you can set the name")
+    old_name = town.name
+    town.set_name(" ".join(command))
+    mage.player.sendMessage("{} renamed to {}".format(old_name, town.name))

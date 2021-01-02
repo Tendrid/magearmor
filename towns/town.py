@@ -60,6 +60,7 @@ class Town(DataStorage):
                 )
             )
         self.data["name"] = name
+        self.save()
 
     def get_rule(self, rule_name):
         return self.data["rule"].get(rule_name)
