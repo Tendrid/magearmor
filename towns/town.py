@@ -64,6 +64,15 @@ class Town(DataStorage):
                 "{} is already a member of {}".format(mage.name, self.name)
             )
         self.data["members"][mage.uuid] = {"rank": 1}
+        self.save()
+
+    def remove_member(self, mage):
+        if self.data["members"].get(mage.uuid) is None:
+            raise PlayerErrorMessage(
+                "{} is not a member of {}".format(mage.name, self.name)
+            )
+        del self.data["members"][mage.uuid]
+        self.save()
 
     def rename_rank(self, rank_name, new_rank_name):
         try:
@@ -99,11 +108,15 @@ class Town(DataStorage):
         self.save()
 
     def set_owner(self, mage):
+        old_owner = MageWorld.get_mage(self.data["owner"])
+
         self.data["owner"] = mage.uuid
-        # for uuid, member in self.data["members"].iteritems():
-        #    if member["rank"] == TOWN_RANK_OWNER:
-        #        member["rank"] = TOWN_RANK_OWNER - 1
-        # self.set_member_rank(mage, self.ranks[TOWN_RANK_OWNER])
+        if old_owner:
+            self.add_memeber(old_owner)
+            self.set_member_rank(old_owner, self.ranks[TOWN_RANK_OWNER - 1])
+
+        if self.data["members"].get(mage.uuid):
+            self.remove_member(mage)
 
     def set_name(self, name):
         if len(name) > MAX_TOWN_NAME_LENGTH:
