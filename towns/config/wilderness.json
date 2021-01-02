@@ -12,7 +12,6 @@
     },
     "rule": {
         "pvp": true,
-        "titlescreen": true,
         "mobspawn": true,
         "spells": true
     }

@@ -21,11 +21,6 @@ class Town(DataStorage):
         return self.data.get("name", "Abandoned Ruins")
 
     @property
-    def welcome(self):
-        if self.get_rule("titlescreen"):
-            return self.data.get("welcome", "")
-
-    @property
     def ranks(self):
         return self.data["ranks"]
 
@@ -131,8 +126,8 @@ class Town(DataStorage):
     def get_rule(self, rule_name):
         return self.data["rule"].get(rule_name)
 
-    def get_player_role(self, player_uuid):
-        if self.owner == player_uuid:
+    def get_player_rank(self, player_uuid):
+        if self.data["owner"] == player_uuid:
             return TOWN_RANK_OWNER
         else:
             return self.data["members"].get(player_uuid, {}).get("rank", 0)

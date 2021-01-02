@@ -26,7 +26,6 @@
     "members": {},
     "rule": {
         "pvp": false,
-        "titlescreen": true,
         "mobspawn": false,
         "spells": true
     }

@@ -145,8 +145,17 @@ class Plugin(BasePlugin):
                     town = to_town
                 else:
                     town = self.wilderness
-                if town.welcome:
-                    mage.player.sendTitle(town.name, town.welcome)
+                rank_idx = town.get_player_rank(mage.uuid)
+                try:
+                    rank = town.ranks[rank_idx]
+                except ValueError:
+                    rank = "Unknown"
+                mage.player.sendTitle(
+                    town.name,
+                    "Rank: {} PvP: {}".format(
+                        rank, "Enabled" if town.get_rule("pvp") else "Disabled"
+                    ),
+                )
 
     @asynchronous()
     def on_player_join(self, event, mage):
@@ -203,7 +212,7 @@ class Plugin(BasePlugin):
     def check_town_permission(self, mage, town, permission):
         # config = MageWorld.get_config(self.lib_name, "config")
         # if mage.has_role("admin")
-        return town.get_player_role(mage.uuid) >= town.data["permissions"].get(
+        return town.get_player_rank(mage.uuid) >= town.data["permissions"].get(
             permission, 9
         )
 
