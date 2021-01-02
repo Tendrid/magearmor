@@ -15,10 +15,7 @@ from uuid import uuid4
 
 class Wilderness(Town):
     def __init__(self, *args, **kwargs):
-        self.data = MageWorld.get_config("towns", "wilderness")
-
-    def set_data(self, *args, **kwargs):
-        pass
+        self.set_data(MageWorld.get_config("towns", "wilderness"))
 
     def add_chunk(self, *args, **kwargs):
         pass
@@ -166,24 +163,38 @@ class Plugin(BasePlugin):
         #     else:
         #         "You can only alter blocks once every <proc[towns_get_setting].context[towns.world_edit_freq]> seconds outside of your town"
         #         do the math
+
         block = event.getBlock()
-        block_chunk = block.getLocation().getChunk()
-        town = self.claims_by_loc[bukkit_chunk.getX()].get(bukkit_chunk.getZ())
-        if town:
-            player_role = town.get_player_role(mage.uuid)
-            print(player_role)
+        bukkit_chunk = block.getLocation().getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        if town and not self.check_town_permission(mage, town, "build"):
             event.setCancelled(True)
+            raise PlayerErrorMessage(
+                "You do not have permission to build in {}".format(town.name)
+            )
 
-    def on_shutdown(self):
-        """
-        - foreach <server.list_online_players>:
-          - run towns_checkunload_town def:<proc[towns_get_town].context[<def[value]>]>
-        """
-        pass
+    def on_block_can_build(self, event, mage):
+        block = event.getBlock()
+        bukkit_chunk = block.getLocation().getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        if mage and not self.check_town_permission(mage, town, "build"):
+            event.setBuildable(False)
+            raise PlayerErrorMessage(
+                "You do not have permission to build in {}".format(town.name)
+            )
 
-    def check_blockchange(self, mage, town):
+    def check_town_permission(self, mage, town, permission):
+        # config = MageWorld.get_config(self.lib_name, "config")
         # if mage.has_role("admin")
-        pass
+        print(town.data["permissions"])
+        print(town.get_player_role(mage.uuid), town.data["permissions"].get(permission))
+        return town.get_player_role(mage.uuid) >= town.data["permissions"].get(
+            permission, 9
+        )
 
         # if player has permission towns.override.build:
         #     return True

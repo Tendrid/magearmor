@@ -2,16 +2,18 @@
     "name": "Wilderness",
     "welcome": "It's dangerous to go alone",
     "permissions": {
-        "create": false
+        "pve":0,
+        "build": 0,
+        "doors": 0,
+        "chests": 0,
+        "buttons": 0,
+        "switches": 0,
+        "plates": 0
     },
     "rule": {
-        "pistons": true,
         "pvp": true,
-        "pve": true,
         "titlescreen": true,
-        "firespread": false,
         "mobspawn": true,
-        "chests": true,
         "spells": true
     }
 }

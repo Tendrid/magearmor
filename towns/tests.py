@@ -7,7 +7,7 @@ from core.mageworld import MageWorld
 from . import Plugin
 from town import Town
 from core.plugin import BasePlugin
-
+from core.storage import BASE_DIR
 from core.exceptions import PlayerErrorMessage
 
 PLAYER_NOTCH = "069a79f4-44e9-4726-a5be-fca90e38aaf5"
@@ -18,6 +18,11 @@ def activate_player(player_id):
     test_player = SERVER.getOfflinePlayer(UUID.fromString(player_id))
     MageWorld.mage_join(test_player)
     return MageWorld.get_mage(player_id)
+
+
+class TestTownPermissions(unittest.TestCase):
+    def test_permissions_exist(self):
+        pass
 
 
 class TestTownFiles(unittest.TestCase):
@@ -31,6 +36,30 @@ class TestTownFiles(unittest.TestCase):
         plugin = MageWorld.plugins[Plugin.lib_name]
 
         self.assertEquals(plugin.config_files, ("default_town", "wilderness", "config"))
+
+    def test_town_set_data(self):
+        plugin = MageWorld.plugins[Plugin.lib_name]
+        path = os.path.abspath(os.path.join(*(BASE_DIR + ("towns", "towns"))))
+
+        # test saved town file with limited deep data (like permissions)
+        # make sure they get updated from default
+        town = Town(
+            "towns", "{}/00000000-0000-0000-0000-000000000001.json".format(path), {},
+        )
+        town.data["permissions"] = {"unknown": "permission"}
+        town.save()
+        self.assertEquals(len(town.data["permissions"].keys()), 1)
+
+        # load the town properly, and make sure the defaults are in there
+        mage_town = plugin.towns.get("00000000-0000-0000-0000-000000000001")
+
+        default_data = MageWorld.get_config(Plugin.lib_name, "default_town")
+        self.assertEquals(
+            len(mage_town.data["permissions"].keys()),
+            len(default_data["permissions"].keys()) + 1,
+        )
+
+        os.remove(mage_town.path)
 
     def test_town_id_from_mage(self):
         mage = activate_player(PLAYER_TENDRID)
@@ -65,11 +94,11 @@ class TestTownFiles(unittest.TestCase):
         # create a new town
         TestTownFiles.town = plugin.create_town(mage)
 
+        # check that uuid in town.members
         self.assertEquals(TestTownFiles.town.data["owner"], PLAYER_NOTCH)
 
-        # claimed_by = plugin.get_town_by_coords(bukkit_chunk.getX(), bukkit_chunk.getZ())
-
-        # check that uuid in town.members, and rank is owner
+        # and rank is owner
+        # todo (fix town members, so owner isnt a member, but mixin town.get_members from owner)
 
     def test_b2_town_name(self):
         with self.assertRaises(PlayerErrorMessage) as create_exception:

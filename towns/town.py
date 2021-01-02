@@ -32,6 +32,13 @@ class Town(DataStorage):
         # override defaults with town settings
         self.data.update(data)
 
+        # add new second level items
+        for k, v in MageWorld.get_config("towns", "default_town").items():
+            if not self.data.get(k):
+                self.data[k] = v
+            elif type(self.data[k]) is dict:
+                self.data[k].update(v)
+
     def set_member_rank(self, mage, rank):
         if self.data["members"].get(mage.uuid) is None:
             self.data["members"] = {}
@@ -57,7 +64,7 @@ class Town(DataStorage):
         return self.data["rule"].get(rule_name)
 
     def get_player_role(self, player_uuid):
-        return self.data["members"].get(player_uuid, {}).get("rank")
+        return self.data["members"].get(player_uuid, {}).get("rank", 0)
 
     def add_chunk(self, x, z, world, plot_type, claimed_by_player):
         # x, z, world, plot_type, claimed_by_player

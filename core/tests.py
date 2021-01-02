@@ -13,6 +13,12 @@ import time
 
 TEST_LIB = "test"
 
+"""
+TODO:
+- test that config handler copies data
+
+"""
+
 
 class TestMageWorld(unittest.TestCase):
     def test_world(self):

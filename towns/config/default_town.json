@@ -16,17 +16,19 @@
     "chunks": [],
     "spawnpoint": [],
     "permissions": {
-        "break_block": 4
+        "pve":2,
+        "build": 3,
+        "doors": 0,
+        "chests": 2,
+        "buttons": 0,
+        "switches": 0,
+        "plates": 0
     },
     "members": {},
     "rule": {
-        "pistons": true,
         "pvp": false,
-        "pve": false,
         "titlescreen": true,
-        "firespread": false,
         "mobspawn": false,
-        "chests": false,
         "spells": true
     }
 }

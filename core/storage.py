@@ -58,6 +58,10 @@ class IndexStorage(object):
                 )
 
     def get(self, key):
+        if self.files.get(key) is None:
+            file_path = os.path.join(self.path, "{}.json".format(key))
+            if os.path.isfile(file_path):
+                self.files[key] = self.storage_module(key, file_path)
         return self.files.get(key)
 
     def add(self, key, data=None):

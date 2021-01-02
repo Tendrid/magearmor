@@ -2,15 +2,17 @@ from core.mageworld import MageWorld
 
 from org.bukkit.event.player import PlayerJoinEvent, PlayerQuitEvent
 from org.bukkit.event.server import ServerLoadEvent
-from org.bukkit.event.player import PlayerMoveEvent
-from org.bukkit.event.block import BlockBreakEvent
+from org.bukkit.event.player import PlayerMoveEvent, PlayerHarvestBlockEvent
+from org.bukkit.event.block import BlockBreakEvent, BlockCanBuildEvent
 
 CALLBACKS_METHODS = {
-    "on_player_join": PlayerJoinEvent,  # asynchronous
-    "on_player_quit": PlayerQuitEvent,  # asynchronous
-    "on_server_load": ServerLoadEvent,  # asynchronous
-    "on_player_move": PlayerMoveEvent,  # asynchronous
-    "on_player_breaks_block": BlockBreakEvent,  # asynchronous
+    "on_player_join": PlayerJoinEvent,
+    "on_player_quit": PlayerQuitEvent,
+    "on_server_load": ServerLoadEvent,
+    "on_player_move": PlayerMoveEvent,
+    "on_player_breaks_block": BlockBreakEvent,
+    "on_player_harvest_block": PlayerHarvestBlockEvent,
+    "on_block_can_build": BlockCanBuildEvent,
 }
 
 

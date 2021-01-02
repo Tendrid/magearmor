@@ -4,6 +4,8 @@ import logging
 import json
 import copy
 
+from core.exceptions import PlayerErrorMessage
+
 from org.bukkit.event.player import PlayerJoinEvent
 from org.bukkit.event.server import ServerCommandEvent
 from org.bukkit.event import EventPriority
@@ -44,7 +46,13 @@ class EventListener(Listener):
         mage = None
         if hasattr(event, "getPlayer"):
             mage = MageWorld.get_mage(str(event.getPlayer().getUniqueId()))
-        self.func(event, mage)
+        try:
+            self.func(event, mage)
+        except PlayerErrorMessage as e:
+            if mage:
+                mage.player.sendMessage(e.message)
+            else:
+                logging.error(e.message)
 
 
 class WorldInstance(object):
