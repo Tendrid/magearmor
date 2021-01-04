@@ -1,0 +1,93 @@
+{
+    "leather": {
+        "acid": -0.75,
+        "hacking": 0.25,
+        "bludgeoning": 0.1,
+        "necrotic": -0.25,
+        "piercing": -0.25,
+        "slashing": -0.25,
+        "fire": -0.75,
+        "cold": -0.75,
+        "divine": 0.5,
+        "arcane": 0.5,
+        "energy": -0.75
+    },
+    "chain": {
+        "acid": 0.15,
+        "hacking": 0.5,
+        "bludgeoning": 0.5,
+        "necrotic": 0.5,
+        "piercing": -0.5,
+        "slashing": -0.5,
+        "fire": 0.15,
+        "cold": 0.15,
+        "divine": 0.5,
+        "arcane": -0.5,
+        "energy": -1
+    },
+    "iron": {
+        "acid": -0.25,
+        "hacking": -0.5,
+        "bludgeoning": -0.5,
+        "necrotic": 0.5,
+        "piercing": 0.25,
+        "slashing": 0.25,
+        "fire": 0.5,
+        "cold": 0.25,
+        "divine": 0.5,
+        "arcane": -0.25,
+        "energy": 0.5
+    },
+    "gold": {
+        "acid": 0.5,
+        "hacking": 0.15,
+        "bludgeoning": 0.15,
+        "necrotic": -0.75,
+        "piercing": -0.15,
+        "slashing": -0.15,
+        "fire": -0.1,
+        "cold": -0.1,
+        "divine": -0.75,
+        "arcane": -0.75,
+        "energy": 0.75
+    },
+    "redstone": {
+        "acid": 0.25,
+        "hacking": -0.1,
+        "bludgeoning": -0.1,
+        "necrotic": -0.5,
+        "piercing": -0.1,
+        "slashing": -0.1,
+        "fire": 0.25,
+        "cold": -0.25,
+        "divine": -0.5,
+        "arcane": -0.5,
+        "energy": -2
+    },
+    "diamond": {
+        "acid": -0.25,
+        "hacking": 0.15,
+        "bludgeoning": 0.15,
+        "necrotic": 0.5,
+        "piercing": -0.25,
+        "slashing": -0.25,
+        "fire": -0.25,
+        "cold": 0.15,
+        "divine": 0.5,
+        "arcane": 0.5,
+        "energy": 0.25
+    },
+    "emerald": {
+        "acid": -0.1,
+        "hacking": 0.25,
+        "bludgeoning": 0.25,
+        "necrotic": -0.5,
+        "piercing": -0.15,
+        "slashing": -0.15,
+        "fire": -0.1,
+        "cold": 0.25,
+        "divine": -0.5,
+        "arcane": -0.5,
+        "energy": 0.25
+    }
+}

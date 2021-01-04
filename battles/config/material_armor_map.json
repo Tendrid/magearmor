@@ -1,0 +1,22 @@
+{
+    "DIAMOND_HELMET": "diamond",
+    "DIAMOND_CHESTPLATE": "diamond",
+    "DIAMOND_LEGGINGS": "diamond",
+    "DIAMOND_BOOTS": "diamond",
+    "IRON_HELMET": "iron",
+    "IRON_CHESTPLATE": "iron",
+    "IRON_LEGGINGS": "iron",
+    "IRON_BOOTS": "iron",
+    "GOLDEN_HELMET": "gold",
+    "GOLDEN_CHESTPLATE": "gold",
+    "GOLDEN_LEGGINGS": "gold",
+    "GOLDEN_BOOTS": "gold",
+    "LEATHER_HELMET": "leather",
+    "LEATHER_CHESTPLATE": "leather",
+    "LEATHER_LEGGINGS": "leather",
+    "LEATHER_BOOTS": "leather",
+    "CHAINMAIL_HELMET": "chain",
+    "CHAINMAIL_CHESTPLATE": "chain",
+    "CHAINMAIL_LEGGINGS": "chain",
+    "CHAINMAIL_BOOTS": "chain"
+}

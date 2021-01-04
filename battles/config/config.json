@@ -1,0 +1,32 @@
+{
+    "default_damage_types": {
+        "physical": "bludgeoning"
+    },
+    "damage_types": {
+        "bludgeoning": "physical",
+        "hacking": "physical",
+        "slashing": "physical",
+        "piercing": "physical",
+        "acid": "elemental",
+        "fire": "elemental",
+        "cold": "elemental",
+        "energy": "elemental",
+        "necrotic": "magic",
+        "divine": "magic",
+        "arcane": "magic"
+    },
+    "default_armor_set": {
+        "bludgeoning": 0,
+        "hacking": 0,
+        "slashing": 0,
+        "piercing": 0,
+        "acid": 0,
+        "fire": 0,
+        "cold": 0,
+        "energy": 0,
+        "necrotic": 0,
+        "divine": 0,
+        "arcane": 0
+    }
+}
+

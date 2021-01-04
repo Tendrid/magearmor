@@ -10,34 +10,6 @@ from org.bukkit.event.player import PlayerJoinEvent
 from org.bukkit.event.server import ServerCommandEvent
 from org.bukkit.event import EventPriority
 
-"""
-class Mage(object):
-    player = None
-    __inventory = None
-    __uuid = None
-
-    armor = None
-
-    def __init__(self, player):
-        self.player = player
-        self.plugins = {}
-
-    def load_plugin_data(self, lib_name, attr):
-        self.plugins[lib_name] = attr
-
-    @property
-    def inventory(self):
-        if not self.__inventory:
-            self.__inventory = self.player.getInventory()
-        return self.__inventory
-
-    @property
-    def uuid(self):
-        if not self.__uuid:
-            self.__uuid = str(self.player.getUniqueId())
-        return self.__uuid
-"""
-
 
 class EventListener(Listener):
     def __init__(self, func):
@@ -105,7 +77,7 @@ class WorldInstance(object):
     """
 
     def register_config(self, lib_name, config_name):
-        logging.info("Registering config: {0}".format(config_name))
+        logging.info("Registering config: {} {}".format(lib_name, config_name))
         path = os.path.abspath(
             os.path.join("python-plugins", lib_name, "config", config_name)
         )

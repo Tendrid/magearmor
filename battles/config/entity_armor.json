@@ -1,0 +1,80 @@
+{
+    "STRAY": {
+        "bludgeoning": 0,
+        "hacking": 0,
+        "slashing": 0,
+        "piercing": 0,
+        "acid": 0,
+        "fire": 1,
+        "cold": -0.25,
+        "energy": 0,
+        "necrotic": 0,
+        "divine": 0,
+        "arcane": 0
+    },
+    "BLAZE": {
+        "bludgeoning": 0,
+        "hacking": 0,
+        "slashing": 0,
+        "piercing": 0,
+        "acid": 0,
+        "fire": -1,
+        "cold": 4,
+        "energy": 0,
+        "necrotic": 0,
+        "divine": 0,
+        "arcane": 0
+    },
+    "GHAST": {
+        "bludgeoning": 0,
+        "hacking": 0,
+        "slashing": 0,
+        "piercing": 0,
+        "acid": 0,
+        "fire": -0.75,
+        "cold": 1.5,
+        "energy": 0,
+        "necrotic": 0,
+        "divine": 0,
+        "arcane": 0
+    },
+    "MAGMA_CUBE": {
+        "bludgeoning": 0,
+        "hacking": 0,
+        "slashing": 0,
+        "piercing": 0,
+        "acid": 0,
+        "fire": -0.9,
+        "cold": 3,
+        "energy": 0,
+        "necrotic": 0,
+        "divine": 0,
+        "arcane": 0
+    },
+    "ZOMBIFIED_PIGLIN": {
+        "bludgeoning": 0,
+        "hacking": 0,
+        "slashing": 0,
+        "piercing": 0,
+        "acid": 0,
+        "fire": -0.75,
+        "cold": 0.5,
+        "energy": 0,
+        "necrotic": 0,
+        "divine": 0,
+        "arcane": 0
+    },
+    "WITHER_SKELETON": {
+        "bludgeoning": 0,
+        "hacking": 0,
+        "slashing": 0,
+        "piercing": 0,
+        "acid": 0,
+        "fire": -0.75,
+        "cold": 1,
+        "energy": 0,
+        "necrotic": 0,
+        "divine": 0,
+        "arcane": 0
+    }
+}

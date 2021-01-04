@@ -1,112 +1,137 @@
-# Import some modules
-from mcapi import *
+from mcapi import asynchronous, synchronous
+from core.plugin import BasePlugin, PluginData
+from mcapi import SERVER
+from core.storage import IndexStorage
 from core.mageworld import MageWorld
+from hero import Hero
+from modifier import ArmorModifier, DamageModifier
 
-from time import sleep
-from random import randint
 
-from org.bukkit.event.block import BlockDamageEvent
-from org.bukkit.event.inventory import InventoryClickEvent, InventoryType
-from org.bukkit.event.entity import EntityDamageByEntityEvent
-
-from org.bukkit.entity import Player, LivingEntity, Projectile, AbstractArrow
-
+from org.bukkit.entity import EntityType, Player, LivingEntity, AbstractArrow
 from org.bukkit import Material
+from org.bukkit.event.inventory import InventoryType
+from org.bukkit.entity.EntityType import PLAYER
 
-from battles.config import *
-
-
-"""
-/py from mcapi import *; remove_event_listeners();
-
-    on player respawns:
-    on player equips armor:
-    on player unequips armor:
-    on entity damages entity:
-"""
-listeners = []
-
-# PlayerItemDamageEvent(Player player, ItemStack what, int damage)
+# dmg hits armor
 
 
-def battles_calc_armor(player):
-    mage = MageWorld.get_mage(str(player.getUniqueId()))
+class Plugin(BasePlugin):
+    lib_name = "battles"
+    config_files = (
+        "config",
+        "entity_armor",
+        "item_armor",
+        "material_armor_map",
+        "weapon_map",
+    )
+    __default_armor = None
 
-    contents = mage.inventory.getArmorContents()
-    player_armor = {x: [] for x in DamageTypes.keys()}
+    def on_load(self):
+        self.heros = IndexStorage(self.lib_name, "heros", Hero)
+        self.load_entities()
+        self.load_materials()
+        self.load_weapons()
 
-    for item in contents:
-        if item:
-            stats = ARMOR_TYPE_MAP.get(item.getType())
-        else:
-            stats = DefaultArmorTypes
-        for name, stat in stats.items():
-            player_armor[name].append(stat)
-    armor = {}
-    for a_type, modifiers in player_armor.items():
-        if modifiers:
-            armor[a_type] = float(sum(modifiers)) / len(modifiers)
-        else:
-            armor[a_type] = 0
-    mage.armor = armor
+    def load_entities(self):
+        # load all the entity armor modifiers
+        self.entities = {}
+        for entity_name, modifiers in MageWorld.get_config(
+            self.lib_name, "entity_armor"
+        ).iteritems():
+            if not hasattr(EntityType, entity_name):
+                raise AttributeError("Invalid entity type: {}".format(entity_name))
+            self.entities[getattr(EntityType, entity_name)] = ArmorModifier(modifiers)
 
-
-from org.bukkit import NamespacedKey
-from org.bukkit.inventory.meta.tags import ItemTagType
-
-
-# e.damager
-# e.entity
-@asynchronous()
-def entity_damage(e):
-    if hasattr(e, "damager"):
-        if isinstance(e.damager, LivingEntity):
-            material = e.damager.getItemInHand().getType()
-        elif isinstance(e.damager, AbstractArrow):
-            item_meta = e.damager.itemStack.getItemMeta()
-            tagContainer = item_meta.getCustomTagContainer()
-
-            key = NamespacedKey(PLUGIN, "spell-id")
-            print(tagContainer.getCustomTag(key, ItemTagType.INTEGER))
-
-            material = e.damager.itemStack.getType()
-        else:
-            material = None
-
-        armor_set = BATTLES_ARMOR_SETS.get(e.entity.getType(), DEFAULT_ARMOR_SET)
-
-        modifiers = []
-        for damage_class in DamageClasses:
-            mod = DAMAGE_TYPE_MAP[damage_class].get(
-                material, DefaultDamageTypes.get(damage_class)
+    def load_materials(self):
+        # map armor materials to modifiers
+        armor_types = MageWorld.get_config(self.lib_name, "item_armor")
+        self.materials = {}
+        for material_name, material_type in MageWorld.get_config(
+            self.lib_name, "material_armor_map"
+        ).iteritems():
+            if not hasattr(Material, material_name):
+                raise AttributeError("Invalid material type: {}".format(material_name))
+            self.materials[getattr(Material, material_name)] = ArmorModifier(
+                armor_types[material_type]
             )
+
+    def load_weapons(self):
+        # load all the weapon damage modifiers
+        self.weapons = {}
+        for material_name, damge_types in MageWorld.get_config(
+            self.lib_name, "weapon_map"
+        ).iteritems():
+            if not hasattr(Material, material_name):
+                raise AttributeError("Invalid material type: {}".format(material_name))
+            self.weapons[getattr(Material, material_name)] = DamageModifier(damge_types)
+
+    @property
+    def default_armor(self):
+        if not self.__default_armor:
+            self.__default_armor = ArmorModifier(self.config["default_armor_set"])
+        return self.__default_armor
+
+    @property
+    def default_weapon(self):
+        if not self.__default_weapon:
+            self.__default_weapon = DamageModifier({})
+        return self.__default_weapon
+
+    def battles_calc_armor(self, mage):
+        hero = self.heros.get_or_create(mage.uuid)
+        player_armor = {x: [] for x in self.config["damage_types"].keys()}
+
+        modifiers = [
+            self.materials.get(x.getType()) if x else self.default_armor
+            for x in mage.inventory.getArmorContents()
+        ]
+
+        armor = sum(modifiers) / len(modifiers)
+
+        hero = self.heros.get_or_create(mage.uuid)
+        hero.set_data(armor.modifiers)
+        hero.save()
+
+    @asynchronous()
+    def on_inventoy_click(self, event, mage):
+        inventory = event.getClickedInventory()
+        entity = inventory.getHolder()
+        if (
+            isinstance(entity, Player)
+            and event.getSlotType() == InventoryType.SlotType.ARMOR
+        ):
+            mage = MageWorld.get_mage(str(entity.getUniqueId()))
+            self.battles_calc_armor(mage)
+
+    def calculate_damage(self, armor, weapon, final_damage):
+        modifiers = []
+        for damage_class, damage_type in weapon.modifiers.items():
+            mod = armor.modifiers.get(damage_type)
             if mod:
-                modifiers.append(armor_set.get(mod, 0))
+                modifiers.append(mod)
+        sum_mod = sum(modifiers)
+        if sum_mod == 0:
+            return final_damage
+        else:
+            return final_damage + (final_damage * (sum(modifiers) / len(modifiers)))
+
+    def on_entity_damaged_by_entity(self, event, mage):
+        if hasattr(event, "damager"):
+            if event.getEntityType() == PLAYER:
+                hero = self.heros.get_or_create(str(entity.getUniqueId()))
+                armor_set = hero.armor_set
             else:
-                modifiers.append(0)
+                armor_set = self.entities.get(
+                    event.entity.getType(), self.default_armor
+                )
 
-        final_damage = e.getFinalDamage() + (
-            e.damage * (sum(modifiers) / len(modifiers))
-        )
-        e.setDamage(final_damage)
+            if isinstance(event.damager, LivingEntity):
+                weapon = self.weapons.get(
+                    event.damager.getItemInHand().getType(), default_weapon
+                )
+            else:
+                weapon = default_weapon
 
+            final_damage = calculate_damage(armor_set, weapon, event.getFinalDamage())
 
-from org.bukkit.inventory import ItemStack
-
-
-def make_item():
-    item = ItemStack(Material.WOODEN_SWORD, 1)
-    item.setItemFlags()
-    print(item.getPersistentDataContainer()())
-
-
-@asynchronous()
-def move_item(e):
-    inventory = e.getClickedInventory()
-    entity = inventory.getHolder()
-    if isinstance(entity, Player) and e.getSlotType() == InventoryType.SlotType.ARMOR:
-        battles_calc_armor(entity)
-
-
-MageWorld.listen(EntityDamageByEntityEvent, entity_damage)
-# MageWorld.listen(InventoryClickEvent, move_item)
+            event.setDamage(final_damage)

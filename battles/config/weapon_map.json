@@ -1,0 +1,62 @@
+{
+    "WOODEN_AXE": {
+        "physical": "bludgeoning"
+    },
+    "STONE_PICKAXE": {
+        "physical": "piercing"
+    },
+    "DIAMOND_PICKAXE": {
+        "physical": "piercing"
+    },
+    "IRON_PICKAXE": {
+        "physical": "piercing"
+    },
+    "IRON_SWORD": {
+        "physical": "slashing"
+    },
+    "GOLDEN_AXE": {
+        "physical": "hacking"
+    },
+    "DIAMOND_SHOVEL": {
+        "physical": "hacking"
+    },
+    "GOLDEN_SHOVEL": {
+        "physical": "hacking"
+    },
+    "STONE_AXE": {
+        "physical": "hacking"
+    },
+    "GOLDEN_PICKAXE": {
+        "physical": "piercing"
+    },
+    "GOLDEN_SWORD": {
+        "physical": "slashing"
+    },
+    "IRON_AXE": {
+        "physical": "hacking"
+    },
+    "WOODEN_SWORD": {
+        "physical": "hacking"
+    },
+    "IRON_SHOVEL": {
+        "physical": "hacking"
+    },
+    "DIAMOND_SWORD": {
+        "physical": "slashing"
+    },
+    "WOODEN_PICKAXE": {
+        "physical": "piercing"
+    },
+    "SHEARS": {
+        "physical": "slashing"
+    },
+    "STONE_SWORD": {
+        "physical": "hacking"
+    },
+    "ARROW": {
+        "physical": "piercing"
+    },
+    "TORCH": {
+        "elemental": "fire"
+    }
+}
