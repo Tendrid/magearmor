@@ -215,3 +215,57 @@ class Plugin(BasePlugin):
         return town.get_player_rank(mage.uuid) >= town.data["permissions"].get(
             permission, 9
         )
+
+    def on_entity_breaks_hanging(self, event, mage):
+        print("HangingBreakEvent")
+
+    def on_player_places_hanging(self, event, mage):
+        print("HangingPlaceEvent")
+
+    def on_player_damages_item_frame(self, event, mage):
+        print("HangingPlaceEvent")
+
+    def on_player_breaks_block(self, event, mage):
+        print("BlockBreakEvent")
+
+    def on_player_places_block(self, event, mage):
+        print("BlockCanBuildEvent")
+
+    def on_player_damages_armor_stand(self, event, mage):
+        print("PlayerArmorStandManipulateEvent")
+
+    def on_player_right_clicks_with_armor_stand(self, event, mage):
+        print("PlayerArmorStandManipulateEvent")
+
+    def on_player_right_clicks_at_armor_stand(self, event, mage):
+        print("PlayerArmorStandManipulateEvent")
+
+    def on_player_opens_inventory(self, event, mage):
+        print("InventoryOpenEvent")
+
+    def on_entity_destroys_vehicle(self, event, mage):
+        print("VehicleDestroyEvent")
+
+    def on_player_empties_bucket(self, event, mage):
+        print("PlayerBucketEvent")
+
+    def on_villager_damaged_by_player(self, event, mage):
+        print("EntityDamageByEntityEvent")
+
+    def on_player_damages_entity(self, event, mage):
+        print("EntityDamageByEntityEvent")
+
+    def on_player_damages_player(self, event, mage):
+        print("EntityDamageByEntityEvent")
+
+    def on_entity_spawns(self, event, mage):
+        print("EntitySpawnEvent")
+
+    def on_liquid_spreads(self, event, mage):
+        to_chunk = event.getToBlock().getChunk()
+        to_town = self.get_town_by_coords(to_chunk.getX(), to_chunk.getZ())
+        if to_town:
+            from_chunk = event.getBlock().getChunk()
+            from_town = self.get_town_by_coords(from_chunk.getX(), from_chunk.getZ())
+            if from_town != to_town:
+                event.setCancelled(True)
