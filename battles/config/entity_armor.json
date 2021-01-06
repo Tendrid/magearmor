@@ -65,16 +65,29 @@
         "arcane": 0
     },
     "WITHER_SKELETON": {
-        "bludgeoning": 0,
-        "hacking": 0,
-        "slashing": 0,
-        "piercing": 0,
+        "bludgeoning": 0.15,
+        "hacking": 0.15,
+        "slashing": -0.25,
+        "piercing": -0.50,
         "acid": 0,
         "fire": -0.75,
         "cold": 1,
         "energy": 0,
-        "necrotic": 0,
-        "divine": 0,
+        "necrotic": -1,
+        "divine": 1,
+        "arcane": 0
+    },
+    "SKELETON": {
+        "bludgeoning": 0.25,
+        "hacking": 0.25,
+        "slashing": -0.25,
+        "piercing": -0.50,
+        "acid": 0,
+        "fire": 0,
+        "cold": 0,
+        "energy": 0,
+        "necrotic": -0.75,
+        "divine": 0.75,
         "arcane": 0
     }
 }

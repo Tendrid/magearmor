@@ -25,6 +25,7 @@ class Plugin(BasePlugin):
         "weapon_map",
     )
     __default_armor = None
+    __default_weapon = None
 
     def on_load(self):
         self.heros = IndexStorage(self.lib_name, "heros", Hero)
@@ -127,11 +128,13 @@ class Plugin(BasePlugin):
 
             if isinstance(event.damager, LivingEntity):
                 weapon = self.weapons.get(
-                    event.damager.getItemInHand().getType(), default_weapon
+                    event.damager.getItemInHand().getType(), self.default_weapon
                 )
             else:
-                weapon = default_weapon
+                weapon = self.default_weapon
 
-            final_damage = calculate_damage(armor_set, weapon, event.getFinalDamage())
+            damage = event.getFinalDamage()
+
+            final_damage = self.calculate_damage(armor_set, weapon, damage)
 
             event.setDamage(final_damage)
