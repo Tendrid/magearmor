@@ -17,15 +17,13 @@ from org.bukkit.event.block import BlockBreakEvent, BlockCanBuildEvent
 
 from org.bukkit.event.hanging import HangingBreakEvent
 from org.bukkit.event.hanging import HangingPlaceEvent
-from org.bukkit.event.block import BlockBreakEvent
-from org.bukkit.event.block import BlockCanBuildEvent
 from org.bukkit.event.player import PlayerArmorStandManipulateEvent
 from org.bukkit.event.inventory import InventoryOpenEvent
 from org.bukkit.event.vehicle import VehicleDestroyEvent
 from org.bukkit.event.player import PlayerBucketEmptyEvent, PlayerBucketFillEvent
-from org.bukkit.event.entity import EntityDamageByEntityEvent
 from org.bukkit.event.entity import EntitySpawnEvent
 from org.bukkit.event.block import BlockFromToEvent
+from org.bukkit.event.player import PlayerInteractEvent, PlayerTeleportEvent
 
 CALLBACKS_METHODS = {
     "on_player_join": PlayerJoinEvent,
@@ -39,20 +37,15 @@ CALLBACKS_METHODS = {
     "on_inventoy_click": InventoryClickEvent,
     "on_entity_breaks_hanging": HangingBreakEvent,
     "on_player_places_hanging": HangingPlaceEvent,
-    "on_player_damages_item_frame": HangingPlaceEvent,
-    "on_player_breaks_block": BlockBreakEvent,
-    "on_player_places_block": BlockCanBuildEvent,
-    "on_player_damages_armor_stand": PlayerArmorStandManipulateEvent,
-    "on_player_right_clicks_with_armor_stand": PlayerArmorStandManipulateEvent,
-    "on_player_right_clicks_at_armor_stand": PlayerArmorStandManipulateEvent,
+    "on_player_manipulate_armor_stand": PlayerArmorStandManipulateEvent,
     "on_player_opens_inventory": InventoryOpenEvent,
     "on_entity_destroys_vehicle": VehicleDestroyEvent,
     "on_player_empties_bucket": PlayerBucketEmptyEvent,
-    "on_villager_damaged_by_player": EntityDamageByEntityEvent,
-    "on_player_damages_entity": EntityDamageByEntityEvent,
-    "on_player_damages_player": EntityDamageByEntityEvent,
+    "on_player_fills_bucket": PlayerBucketFillEvent,
     "on_entity_spawns": EntitySpawnEvent,
     "on_liquid_spreads": BlockFromToEvent,
+    "on_player_interact": PlayerInteractEvent,
+    "on_player_teleport": PlayerTeleportEvent,
 }
 
 

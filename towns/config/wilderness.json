@@ -10,6 +10,7 @@
         "plates": 0
     },
     "rule": {
+        "teleport": true,
         "pvp": true,
         "mobspawn": true,
         "spells": true

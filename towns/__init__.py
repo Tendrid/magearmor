@@ -12,6 +12,12 @@ from core.exceptions import PlayerErrorMessage
 
 from uuid import uuid4
 
+from org.bukkit.event.hanging import HangingBreakEvent
+from org.bukkit.entity import Player, Monster, ArmorStand, AbstractVillager
+from org.bukkit.event.player.PlayerTeleportEvent import TeleportCause
+from org.bukkit.Material import ARMOR_STAND
+from org.bukkit.event.block.Action import RIGHT_CLICK_BLOCK, PHYSICAL, LEFT_CLICK_BLOCK
+
 
 class Wilderness(Town):
     def __init__(self, *args, **kwargs):
@@ -176,15 +182,7 @@ class Plugin(BasePlugin):
         # save town data
 
     def on_player_breaks_block(self, event, mage):
-        # if in town:
-        #     check_blockchange()
-        #     town.xp += 1
-        # else:
-        #     if server flag no_build:
-        #         "Building in wilderness is forbidden"
-        #     else:
-        #         "You can only alter blocks once every <proc[towns_get_setting].context[towns.world_edit_freq]> seconds outside of your town"
-        #         do the math
+        # print(">> BlockBreakEvent")
 
         block = event.getBlock()
         bukkit_chunk = block.getLocation().getChunk()
@@ -198,6 +196,7 @@ class Plugin(BasePlugin):
             )
 
     def on_block_can_build(self, event, mage):
+        # print(">> BlockCanBuildEvent")
         block = event.getBlock()
         bukkit_chunk = block.getLocation().getChunk()
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
@@ -217,49 +216,212 @@ class Plugin(BasePlugin):
         )
 
     def on_entity_breaks_hanging(self, event, mage):
-        print("HangingBreakEvent")
+        # check for build role
+        # print(">> HangingBreakEvent")
+
+        hanging_entity = event.getEntity()
+        player = event.getRemover()
+        if event.getCause() == HangingBreakEvent.RemoveCause.ENTITY and isinstance(
+            player, Player
+        ):
+            mage = MageWorld.get_mage(str(player.getUniqueId()))
+
+            bukkit_chunk = hanging_entity.getLocation().getChunk()
+            town = self.claims_by_loc[bukkit_chunk.getX()].get(
+                bukkit_chunk.getZ(), self.wilderness
+            )
+            if town and not self.check_town_permission(mage, town, "build"):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to build in {}".format(town.name),
+                    player,
+                )
+        else:
+            # not a player
+            event.setCancelled(True)
 
     def on_player_places_hanging(self, event, mage):
-        print("HangingPlaceEvent")
+        # check for build role
+        # print(">> HangingPlaceEvent")
+        hanging_entity = event.getEntity()
+        bukkit_chunk = hanging_entity.getLocation().getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        if town and not self.check_town_permission(mage, town, "build"):
+            event.setCancelled(True)
+            raise PlayerErrorMessage(
+                "You do not have permission to build in {}".format(town.name)
+            )
 
-    def on_player_damages_item_frame(self, event, mage):
-        print("HangingPlaceEvent")
-
-    def on_player_breaks_block(self, event, mage):
-        print("BlockBreakEvent")
-
-    def on_player_places_block(self, event, mage):
-        print("BlockCanBuildEvent")
-
-    def on_player_damages_armor_stand(self, event, mage):
-        print("PlayerArmorStandManipulateEvent")
-
-    def on_player_right_clicks_with_armor_stand(self, event, mage):
-        print("PlayerArmorStandManipulateEvent")
-
-    def on_player_right_clicks_at_armor_stand(self, event, mage):
-        print("PlayerArmorStandManipulateEvent")
+    def on_player_manipulate_armor_stand(self, event, mage):
+        # check for build role
+        # print(">> PlayerArmorStandManipulateEvent")
+        armor_stand_entity = event.getRightClicked()
+        bukkit_chunk = armor_stand_entity.getLocation().getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        if town and not self.check_town_permission(mage, town, "build"):
+            event.setCancelled(True)
+            raise PlayerErrorMessage(
+                "You do not have permission to build in {}".format(town.name)
+            )
 
     def on_player_opens_inventory(self, event, mage):
-        print("InventoryOpenEvent")
+        # check for chests role
+        # print(">> InventoryOpenEvent")
+        inventory = event.getInventory()
+        bukkit_chunk = inventory.getLocation().getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        if town and not self.check_town_permission(mage, town, "chests"):
+            event.setCancelled(True)
+            raise PlayerErrorMessage(
+                "You do not have permission to open chests in {}".format(town.name)
+            )
 
     def on_entity_destroys_vehicle(self, event, mage):
-        print("VehicleDestroyEvent")
+        # check for build role
+        # print(">> VehicleDestroyEvent")
+        player = event.getAttacker()
+        if isinstance(player, Player):
+            cart_entity = event.getVehicle()
+            mage = MageWorld.get_mage(str(player.getUniqueId()))
+            bukkit_chunk = cart_entity.getLocation().getChunk()
+            town = self.claims_by_loc[bukkit_chunk.getX()].get(
+                bukkit_chunk.getZ(), self.wilderness
+            )
+            if town and not self.check_town_permission(mage, town, "build"):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to build in {}".format(town.name),
+                    player,
+                )
+        else:
+            # not a player
+            event.setCancelled(True)
 
     def on_player_empties_bucket(self, event, mage):
-        print("PlayerBucketEvent")
+        # check for build role
+        # print(">> PlayerBucketEmptyEvent")
+        block = event.getBlock()
+        bukkit_chunk = block.getLocation().getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        if mage and not self.check_town_permission(mage, town, "build"):
+            event.setBuildable(False)
+            raise PlayerErrorMessage(
+                "You do not have permission to build in {}".format(town.name)
+            )
 
-    def on_villager_damaged_by_player(self, event, mage):
-        print("EntityDamageByEntityEvent")
+    def on_player_fills_bucket(self, event, mage):
+        # print(">> PlayerBucketFillEvent")
+        block = event.getBlock()
+        bukkit_chunk = block.getLocation().getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        if mage and not self.check_town_permission(mage, town, "build"):
+            event.setBuildable(False)
+            raise PlayerErrorMessage(
+                "You do not have permission to build in {}".format(town.name)
+            )
 
-    def on_player_damages_entity(self, event, mage):
-        print("EntityDamageByEntityEvent")
+    def on_entity_damaged_by_entity(self, event, mage):
+        # check for pve flag
+        # print(">> EntityDamageByEntityEvent")
 
-    def on_player_damages_player(self, event, mage):
-        print("EntityDamageByEntityEvent")
+        damager = event.getDamager() if hasattr(event, "getDamager") else None
+        target = event.getEntity()
+        # if damager is player:
+        if isinstance(damager, Player):
+            mage = MageWorld.get_mage(str(damager.getUniqueId()))
+
+            location = target.getLocation()
+            bukkit_chunk = location.getChunk()
+            town = self.claims_by_loc[bukkit_chunk.getX()].get(
+                bukkit_chunk.getZ(), self.wilderness
+            )
+
+            if isinstance(target, Monster):
+                # killing monsters is ok
+                pass
+            elif isinstance(target, Player):
+                # check pvp flag
+                if not town.get_rule("pvp"):
+                    event.setCancelled(True)
+                    raise PlayerErrorMessage(
+                        "PvP is forbidden in {}".format(town.name), mage.player,
+                    )
+            elif isinstance(target, ArmorStand):
+                if not self.check_town_permission(mage, town, "build"):
+                    event.setCancelled(True)
+                    raise PlayerErrorMessage(
+                        "You do not have permission to build in {}".format(town.name),
+                        mage.player,
+                    )
+            # elif isinstance(target, AbstractVillager):
+            #     if not town.get_rule("pve"):
+            #         event.setCancelled(True)
+            #         raise PlayerErrorMessage(
+            #             "PvE is forbidden in {}".format(town.name), mage.player,
+            #         )
+            else:
+                if not town.get_rule("pve"):
+                    event.setCancelled(True)
+                    raise PlayerErrorMessage(
+                        "PvE is forbidden in {}".format(town.name), mage.player,
+                    )
 
     def on_entity_spawns(self, event, mage):
-        print("EntitySpawnEvent")
+        # check mob spawn
+        # print(">> EntitySpawnEvent")
+        entity = event.getEntity()
+
+        location = event.getLocation()
+        bukkit_chunk = location.getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        if town:
+            if isinstance(entity, Monster) and not town.get_rule("mobspawn"):
+                event.setCancelled(True)
+
+    def on_player_interact(self, event, mage):
+        # RIGHT_CLICK_BLOCK, PHYSICAL, LEFT_CLICK_BLOCK
+        # print(">> PlayerInteractEvent")
+        action = event.getAction()
+        if action == RIGHT_CLICK_BLOCK:
+            # check if armor stand
+            location = event.getClickedBlock().getLocation()
+            bukkit_chunk = location.getChunk()
+            town = self.claims_by_loc[bukkit_chunk.getX()].get(
+                bukkit_chunk.getZ(), self.wilderness
+            )
+
+            if mage.player.getItemInHand().getType() == ARMOR_STAND and not self.check_town_permission(
+                mage, town, "build"
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to build in {}".format(town.name)
+                )
+
+    def on_player_teleport(self, event, mage):
+        # print(">> PlayerTeleportEvent")
+        if event.getCause() == TeleportCause.ENDER_PEARL:
+            bukkit_chunk = event.getTo().getChunk()
+            town = self.claims_by_loc[bukkit_chunk.getX()].get(
+                bukkit_chunk.getZ(), self.wilderness
+            )
+            if town and not town.get_rule("teleport"):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "Teleportation is forbidden in {}".format(town.name)
+                )
 
     def on_liquid_spreads(self, event, mage):
         to_chunk = event.getToBlock().getChunk()

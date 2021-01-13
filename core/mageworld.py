@@ -24,6 +24,8 @@ class EventListener(Listener):
         except PlayerErrorMessage as e:
             if mage:
                 mage.player.sendMessage(e.message)
+            elif e.player:
+                e.player.sendMessage(e.message)
             else:
                 logging.error(e.message)
 

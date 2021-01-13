@@ -96,13 +96,14 @@ class Plugin(BasePlugin):
     @asynchronous()
     def on_inventoy_click(self, event, mage):
         inventory = event.getClickedInventory()
-        entity = inventory.getHolder()
-        if (
-            isinstance(entity, Player)
-            and event.getSlotType() == InventoryType.SlotType.ARMOR
-        ):
-            mage = MageWorld.get_mage(str(entity.getUniqueId()))
-            self.battles_calc_armor(mage)
+        if hasattr(inventory, "getHolder"):
+            entity = inventory.getHolder()
+            if (
+                isinstance(entity, Player)
+                and event.getSlotType() == InventoryType.SlotType.ARMOR
+            ):
+                mage = MageWorld.get_mage(str(entity.getUniqueId()))
+                self.battles_calc_armor(mage)
 
     def calculate_damage(self, armor, weapon, final_damage):
         modifiers = []
@@ -126,7 +127,9 @@ class Plugin(BasePlugin):
                     event.entity.getType(), self.default_armor
                 )
 
-            if isinstance(event.damager, LivingEntity):
+            if isinstance(event.damager, LivingEntity) and hasattr(
+                event.damager, "getItemInHand"
+            ):
                 weapon = self.weapons.get(
                     event.damager.getItemInHand().getType(), self.default_weapon
                 )

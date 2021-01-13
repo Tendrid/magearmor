@@ -14,7 +14,10 @@ def register_command(plugin_name, command):
             try:
                 return f(mage, list(command))
             except PlayerErrorMessage as e:
-                mage.player.sendMessage(e.message)
+                if mage:
+                    mage.player.sendMessage(e.message)
+                elif e.player:
+                    e.player.sendMessage(e.message)
 
         # register wrapped command
         add_command("{}-{}".format(plugin.lib_name, command), wrapped_f)

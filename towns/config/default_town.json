@@ -24,6 +24,7 @@
     },
     "members": {},
     "rule": {
+        "teleport": false,
         "pvp": false,
         "mobspawn": false,
         "spells": true
