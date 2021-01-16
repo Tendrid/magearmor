@@ -370,7 +370,7 @@ class Plugin(BasePlugin):
             #             "PvE is forbidden in {}".format(town.name), mage.player,
             #         )
             else:
-                if not town.get_rule("pve"):
+                if not self.check_town_permission(mage, town, "pve"):
                     event.setCancelled(True)
                     raise PlayerErrorMessage(
                         "PvE is forbidden in {}".format(town.name), mage.player,
