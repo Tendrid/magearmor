@@ -227,7 +227,9 @@ class Plugin(BasePlugin):
         # print(">> HangingBreakEvent")
 
         hanging_entity = event.getEntity()
-        player = event.getRemover()
+        player = None
+        if hasattr(event, "getRemover"):
+            player = event.getRemover()
         if event.getCause() == HangingBreakEvent.RemoveCause.ENTITY and isinstance(
             player, Player
         ):
