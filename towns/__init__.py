@@ -13,7 +13,14 @@ from core.exceptions import PlayerErrorMessage
 from uuid import uuid4
 
 from org.bukkit.event.hanging import HangingBreakEvent
-from org.bukkit.entity import Player, TNTPrimed, Monster, ArmorStand, AbstractVillager
+from org.bukkit.entity import (
+    Player,
+    TNTPrimed,
+    Monster,
+    ArmorStand,
+    AbstractVillager,
+    Creeper,
+)
 from org.bukkit.event.player.PlayerTeleportEvent import TeleportCause
 from org.bukkit.Material import ARMOR_STAND
 from org.bukkit.event.block.Action import RIGHT_CLICK_BLOCK, PHYSICAL, LEFT_CLICK_BLOCK
@@ -337,7 +344,7 @@ class Plugin(BasePlugin):
         damager = event.getDamager() if hasattr(event, "getDamager") else None
         target = event.getEntity()
         # if damager is player:
-        if isinstance(damager, Player):
+        if isinstance(damager, Player) or isinstance(damager, TNTPrimed):
             mage = MageWorld.get_mage(str(damager.getUniqueId()))
 
             location = target.getLocation()
@@ -375,6 +382,19 @@ class Plugin(BasePlugin):
                     raise PlayerErrorMessage(
                         "PvE is forbidden in {}".format(town.name), mage.player,
                     )
+        elif isinstance(damager, Creeper):
+            location = target.getLocation()
+            bukkit_chunk = location.getChunk()
+            town = self.claims_by_loc[bukkit_chunk.getX()].get(
+                bukkit_chunk.getZ(), self.wilderness
+            )
+            if isinstance(target, ArmorStand):
+                if not town.get_rule("creeper"):
+                    # dont let creepers kill ArmorStand if rule
+                    event.setCancelled(True)
+            elif not isinstance(target, Player) and not isinstance(target, Monster):
+                # creepers can kill players and other monsters
+                event.setCancelled(True)
 
     def on_entity_spawns(self, event, mage):
         # check mob spawn
@@ -433,14 +453,18 @@ class Plugin(BasePlugin):
                 event.setCancelled(True)
 
     def on_entity_explode(self, event, mage):
-        bukkit_chunk = event.getLocation().getChunk()
-        town = self.claims_by_loc[bukkit_chunk.getX()].get(
-            bukkit_chunk.getZ(), self.wilderness
-        )
         damager = event.getEntity()
-        if isinstance(damager, TNTPrimed) and not town.get_rule("tnt"):
-            event.setCancelled(True)
-        elif isinstance(damager, Monster) and not town.get_rule("creeper"):
-            event.setCancelled(True)
-        else:
-            event.setCancelled(True)
+        for block in event.blockList():
+            bukkit_chunk = block.getLocation().getChunk()
+
+            town = self.claims_by_loc[bukkit_chunk.getX()].get(
+                bukkit_chunk.getZ(), self.wilderness
+            )
+            if isinstance(damager, TNTPrimed):
+                if not town.get_rule("tnt"):
+                    event.setCancelled(True)
+            elif isinstance(damager, Creeper):
+                if not town.get_rule("creeper"):
+                    event.setCancelled(True)
+            else:
+                event.setCancelled(True)
