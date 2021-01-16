@@ -21,7 +21,7 @@ from org.bukkit.event.player import PlayerArmorStandManipulateEvent
 from org.bukkit.event.inventory import InventoryOpenEvent
 from org.bukkit.event.vehicle import VehicleDestroyEvent
 from org.bukkit.event.player import PlayerBucketEmptyEvent, PlayerBucketFillEvent
-from org.bukkit.event.entity import EntitySpawnEvent
+from org.bukkit.event.entity import CreatureSpawnEvent
 from org.bukkit.event.block import BlockFromToEvent
 from org.bukkit.event.player import (
     PlayerInteractEvent,
@@ -29,6 +29,7 @@ from org.bukkit.event.player import (
     PlayerInteractEntityEvent,
 )
 from org.bukkit.event.entity import EntityExplodeEvent
+from org.bukkit.event.entity import EntityChangeBlockEvent
 
 
 CALLBACKS_METHODS = {
@@ -48,12 +49,13 @@ CALLBACKS_METHODS = {
     "on_entity_destroys_vehicle": VehicleDestroyEvent,
     "on_player_empties_bucket": PlayerBucketEmptyEvent,
     "on_player_fills_bucket": PlayerBucketFillEvent,
-    "on_entity_spawns": EntitySpawnEvent,
+    "on_creature_spawns": CreatureSpawnEvent,
     "on_liquid_spreads": BlockFromToEvent,
     "on_player_interact": PlayerInteractEvent,
     "on_player_interact_with_entity": PlayerInteractEntityEvent,
     "on_player_teleport": PlayerTeleportEvent,
     "on_entity_explode": EntityExplodeEvent,
+    "on_entity_change_block": EntityChangeBlockEvent,
 }
 
 

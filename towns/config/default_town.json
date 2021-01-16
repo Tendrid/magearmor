@@ -20,7 +20,6 @@
         "chests": 2,
         "buttons": 1,
         "levers": 1,
-        "plates": 0,
         "trapdoors": 1
     },
     "members": {},
@@ -28,6 +27,7 @@
         "teleport": false,
         "tnt": false,
         "creeper": false,
+        "wither": false,
         "pvp": false,
         "mobspawn": false,
         "spells": true

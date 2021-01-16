@@ -4,11 +4,10 @@
         "pve":0,
         "build": 0,
         "chests": 0,
-        "doors": 1,
-        "buttons": 1,
-        "levers": 1,
-        "plates": 1,
-        "trapdoors": 1
+        "doors": 0,
+        "buttons": 0,
+        "levers": 0,
+        "trapdoors": 0
     },
     "rule": {
         "teleport": true,
@@ -16,6 +15,7 @@
         "tnt": true,
         "creeper": false,
         "mobspawn": true,
-        "spells": true
+        "spells": true,
+        "wither": true
     }
 }

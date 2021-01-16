@@ -24,11 +24,14 @@ from org.bukkit.entity import (
 )
 from org.bukkit.event.player.PlayerTeleportEvent import TeleportCause
 from org.bukkit.Material import ARMOR_STAND
+from org.bukkit.entity.EntityType import WITHER
 from org.bukkit.event.block import Action
 from org.bukkit.inventory import EquipmentSlot
 
 from core.collections import DOORS, TRAPDOORS, BUTTONS, PRESSUREPLATES
 from org.bukkit.Material import LEVER
+
+from org.bukkit.event.entity.CreatureSpawnEvent import SpawnReason
 
 
 class Wilderness(Town):
@@ -403,7 +406,7 @@ class Plugin(BasePlugin):
                 # creepers can kill players and other monsters
                 event.setCancelled(True)
 
-    def on_entity_spawns(self, event, mage):
+    def on_creature_spawns(self, event, mage):
         # check mob spawn
         # print(">> EntitySpawnEvent")
         entity = event.getEntity()
@@ -414,6 +417,12 @@ class Plugin(BasePlugin):
             bukkit_chunk.getZ(), self.wilderness
         )
         if town:
+            if (
+                hasattr(event, "getSpawnReason")
+                and event.getSpawnReason() == SpawnReason.BUILD_WITHER
+                and not town.get_rule("wither")
+            ):
+                event.setCancelled(True)
             if isinstance(entity, Monster) and not town.get_rule("mobspawn"):
                 event.setCancelled(True)
 
@@ -472,21 +481,17 @@ class Plugin(BasePlugin):
                 raise PlayerErrorMessage(
                     "You do not have permission to build in {}".format(town.name)
                 )
-        elif action == Action.PHYSICAL:
-            block = event.getClickedBlock()
-            material = block.getType()
-            town = self.claims_by_loc[bukkit_chunk.getX()].get(
-                bukkit_chunk.getZ(), self.wilderness
-            )
-            if material in PRESSUREPLATES and not self.check_town_permission(
-                mage, town, "plates"
-            ):
-                event.setCancelled(True)
-                raise PlayerErrorMessage(
-                    "You do not have permission to use pressure plates in {}".format(
-                        town.name
-                    )
-                )
+        # elif action == Action.PHYSICAL:
+        #     block = event.getClickedBlock()
+        #     material = block.getType()
+        #     bukkit_chunk = block.getLocation().getChunk()
+        #     town = self.claims_by_loc[bukkit_chunk.getX()].get(
+        #         bukkit_chunk.getZ(), self.wilderness
+        #     )
+        #     if material in PRESSUREPLATES and not self.check_town_permission(
+        #         mage, town, "plates"
+        #     ):
+        #         event.setCancelled(True)
 
     def on_player_interact_with_entity(self, event, mage):
         # print(">> PlayerInteractEntityEvent")
@@ -543,3 +548,13 @@ class Plugin(BasePlugin):
                     event.setCancelled(True)
             else:
                 event.setCancelled(True)
+
+    def on_entity_change_block(self, event, mage):
+        block = event.getBlock()
+        bukkit_chunk = block.getLocation().getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        if town and event.getEntityType() == WITHER and not town.get_rule("wither"):
+            event.getEntity().remove()
+            event.setCancelled(True)
