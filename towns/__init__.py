@@ -20,10 +20,12 @@ from org.bukkit.entity import (
     ArmorStand,
     AbstractVillager,
     Creeper,
+    ItemFrame,
 )
 from org.bukkit.event.player.PlayerTeleportEvent import TeleportCause
 from org.bukkit.Material import ARMOR_STAND
 from org.bukkit.event.block.Action import RIGHT_CLICK_BLOCK, PHYSICAL, LEFT_CLICK_BLOCK
+from org.bukkit.inventory import EquipmentSlot
 
 
 class Wilderness(Town):
@@ -418,19 +420,34 @@ class Plugin(BasePlugin):
         action = event.getAction()
         if action == RIGHT_CLICK_BLOCK:
             # check if armor stand
-            location = event.getClickedBlock().getLocation()
-            bukkit_chunk = location.getChunk()
+            block = event.getClickedBlock()
+            bukkit_chunk = block.getLocation().getChunk()
             town = self.claims_by_loc[bukkit_chunk.getX()].get(
                 bukkit_chunk.getZ(), self.wilderness
             )
+            if not self.check_town_permission(mage, town, "build"):
+                if mage.player.getItemInHand().getType():
+                    event.setCancelled(True)
+                    raise PlayerErrorMessage(
+                        "You do not have permission to build in {}".format(town.name)
+                    )
 
-            if mage.player.getItemInHand().getType() == ARMOR_STAND and not self.check_town_permission(
-                mage, town, "build"
-            ):
-                event.setCancelled(True)
-                raise PlayerErrorMessage(
-                    "You do not have permission to build in {}".format(town.name)
-                )
+    def on_player_interact_with_entity(self, event, mage):
+        # print(">> PlayerInteractEntityEvent")
+        hand = event.getHand()
+        if hand == EquipmentSlot.HAND:
+            # check if armor stand
+            entity = event.getRightClicked()
+            bukkit_chunk = entity.getLocation().getChunk()
+            town = self.claims_by_loc[bukkit_chunk.getX()].get(
+                bukkit_chunk.getZ(), self.wilderness
+            )
+            if not self.check_town_permission(mage, town, "build"):
+                if isinstance(entity, ItemFrame):
+                    event.setCancelled(True)
+                    raise PlayerErrorMessage(
+                        "You do not have permission to build in {}".format(town.name)
+                    )
 
     def on_player_teleport(self, event, mage):
         # print(">> PlayerTeleportEvent")
