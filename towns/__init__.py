@@ -334,7 +334,7 @@ class Plugin(BasePlugin):
             bukkit_chunk.getZ(), self.wilderness
         )
         if mage and not self.check_town_permission(mage, town, "build"):
-            event.setCancelled(False)
+            event.setBuildable(False)
             raise PlayerErrorMessage(
                 "You do not have permission to build in {}".format(town.name)
             )
