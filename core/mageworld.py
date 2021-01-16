@@ -56,7 +56,7 @@ class WorldInstance(object):
         return listener
 
     def get_mage(self, player_id):
-        return self.plugins["mages"].mages.get(player_id)
+        return self.plugins["mages"].mages.get_or_create(player_id)
 
     def get_mage_by_name(self, player_name):
         mages = self.plugins["mages"].mages.get_by("name", player_name)

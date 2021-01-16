@@ -11,8 +11,8 @@ class Plugin(BasePlugin):
 
     def on_load(self):
         self.mages = IndexStorage(self.lib_name, "mages", Mage)
-        for player in SERVER.getOnlinePlayers():
-            self.players.get_or_create(player)
+        # for player in SERVER.getOnlinePlayers():
+        #    self.mages.get_or_create(player)
 
     @asynchronous()
     def on_player_join(self, event, mage):
