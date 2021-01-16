@@ -120,7 +120,7 @@ class Plugin(BasePlugin):
     def on_entity_damaged_by_entity(self, event, mage):
         if hasattr(event, "damager"):
             if event.getEntityType() == PLAYER:
-                hero = self.heros.get_or_create(str(entity.getUniqueId()))
+                hero = self.heros.get_or_create(str(event.entity.getUniqueId()))
                 armor_set = hero.armor_set
             else:
                 armor_set = self.entities.get(

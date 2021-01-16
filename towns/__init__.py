@@ -13,7 +13,7 @@ from core.exceptions import PlayerErrorMessage
 from uuid import uuid4
 
 from org.bukkit.event.hanging import HangingBreakEvent
-from org.bukkit.entity import Player, Monster, ArmorStand, AbstractVillager
+from org.bukkit.entity import Player, TNTPrimed, Monster, ArmorStand, AbstractVillager
 from org.bukkit.event.player.PlayerTeleportEvent import TeleportCause
 from org.bukkit.Material import ARMOR_STAND
 from org.bukkit.event.block.Action import RIGHT_CLICK_BLOCK, PHYSICAL, LEFT_CLICK_BLOCK
@@ -431,3 +431,16 @@ class Plugin(BasePlugin):
             from_town = self.get_town_by_coords(from_chunk.getX(), from_chunk.getZ())
             if from_town != to_town:
                 event.setCancelled(True)
+
+    def on_entity_explode(self, event, mage):
+        bukkit_chunk = event.getLocation().getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        damager = event.getEntity()
+        if isinstance(damager, TNTPrimed) and not town.get_rule("tnt"):
+            event.setCancelled(True)
+        elif isinstance(damager, Monster) and not town.get_rule("creeper"):
+            event.setCancelled(True)
+        else:
+            event.setCancelled(True)

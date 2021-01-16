@@ -12,6 +12,8 @@
     "rule": {
         "teleport": true,
         "pvp": true,
+        "tnt": true,
+        "creeper": false,
         "mobspawn": true,
         "spells": true
     }

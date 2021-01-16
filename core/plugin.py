@@ -24,6 +24,8 @@ from org.bukkit.event.player import PlayerBucketEmptyEvent, PlayerBucketFillEven
 from org.bukkit.event.entity import EntitySpawnEvent
 from org.bukkit.event.block import BlockFromToEvent
 from org.bukkit.event.player import PlayerInteractEvent, PlayerTeleportEvent
+from org.bukkit.event.entity import EntityExplodeEvent
+
 
 CALLBACKS_METHODS = {
     "on_player_join": PlayerJoinEvent,
@@ -46,6 +48,7 @@ CALLBACKS_METHODS = {
     "on_liquid_spreads": BlockFromToEvent,
     "on_player_interact": PlayerInteractEvent,
     "on_player_teleport": PlayerTeleportEvent,
+    "on_entity_explode": EntityExplodeEvent,
 }
 
 
