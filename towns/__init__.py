@@ -24,8 +24,11 @@ from org.bukkit.entity import (
 )
 from org.bukkit.event.player.PlayerTeleportEvent import TeleportCause
 from org.bukkit.Material import ARMOR_STAND
-from org.bukkit.event.block.Action import RIGHT_CLICK_BLOCK, PHYSICAL, LEFT_CLICK_BLOCK
+from org.bukkit.event.block import Action
 from org.bukkit.inventory import EquipmentSlot
+
+from core.collections import DOORS, TRAPDOORS, BUTTONS, PRESSUREPLATES
+from org.bukkit.Material import LEVER
 
 
 class Wilderness(Town):
@@ -414,23 +417,76 @@ class Plugin(BasePlugin):
             if isinstance(entity, Monster) and not town.get_rule("mobspawn"):
                 event.setCancelled(True)
 
+    # lever: check block type is lever abstract
+    # trapdoor: check if block type is trapdoor abstract
+    # button: check if block type is button abstract
+    # door: check if block type is door abstract
     def on_player_interact(self, event, mage):
-        # RIGHT_CLICK_BLOCK, PHYSICAL, LEFT_CLICK_BLOCK
+        # Action.RIGHT_CLICK_BLOCK, Action.PHYSICAL, Action.LEFT_CLICK_BLOCK
         # print(">> PlayerInteractEvent")
         action = event.getAction()
-        if action == RIGHT_CLICK_BLOCK:
+        if action == Action.RIGHT_CLICK_BLOCK:
             # check if armor stand
             block = event.getClickedBlock()
             bukkit_chunk = block.getLocation().getChunk()
             town = self.claims_by_loc[bukkit_chunk.getX()].get(
                 bukkit_chunk.getZ(), self.wilderness
             )
-            if not self.check_town_permission(mage, town, "build"):
-                if mage.player.getItemInHand().getType():
-                    event.setCancelled(True)
-                    raise PlayerErrorMessage(
-                        "You do not have permission to build in {}".format(town.name)
+            material = block.getType()
+            if material == LEVER and not self.check_town_permission(
+                mage, town, "levers"
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to use levers in {}".format(town.name)
+                )
+            elif material in TRAPDOORS and not self.check_town_permission(
+                mage, town, "trapdoors"
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to use trap doors in {}".format(
+                        town.name
                     )
+                )
+            elif material in BUTTONS and not self.check_town_permission(
+                mage, town, "buttons"
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to use buttons in {}".format(town.name)
+                )
+            elif material in DOORS and not self.check_town_permission(
+                mage, town, "doors"
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to use doors in {}".format(town.name)
+                )
+            # check for armor stand placement last
+            elif (
+                not self.check_town_permission(mage, town, "build")
+                and mage.player.getItemInHand().getType() == ARMOR_STAND
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to build in {}".format(town.name)
+                )
+        elif action == Action.PHYSICAL:
+            block = event.getClickedBlock()
+            material = block.getType()
+            town = self.claims_by_loc[bukkit_chunk.getX()].get(
+                bukkit_chunk.getZ(), self.wilderness
+            )
+            if material in PRESSUREPLATES and not self.check_town_permission(
+                mage, town, "plates"
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to use pressure plates in {}".format(
+                        town.name
+                    )
+                )
 
     def on_player_interact_with_entity(self, event, mage):
         # print(">> PlayerInteractEntityEvent")

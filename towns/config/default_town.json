@@ -19,8 +19,9 @@
         "doors": 0,
         "chests": 2,
         "buttons": 1,
-        "switches": 1,
-        "plates": 0
+        "levers": 1,
+        "plates": 0,
+        "trapdoors": 1
     },
     "members": {},
     "rule": {
