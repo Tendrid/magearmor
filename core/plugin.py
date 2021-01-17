@@ -30,6 +30,8 @@ from org.bukkit.event.player import (
 )
 from org.bukkit.event.entity import EntityExplodeEvent, EntityChangeBlockEvent
 
+from org.bukkit.event.block import BlockPistonExtendEvent, BlockPistonRetractEvent
+
 CALLBACKS_METHODS = {
     "on_player_join": PlayerJoinEvent,
     "on_player_quit": PlayerQuitEvent,
@@ -55,6 +57,8 @@ CALLBACKS_METHODS = {
     "on_entity_explode": EntityExplodeEvent,
     "on_entity_change_block": EntityChangeBlockEvent,
     "on_player_leash_entity": PlayerLeashEntityEvent,
+    "on_piston_extend": BlockPistonExtendEvent,
+    "on_piston_retract": BlockPistonRetractEvent,
 }
 
 

@@ -1,13 +1,13 @@
 {
     "name": "Wilderness",
     "permissions": {
-        "pve": 0,
-        "build": 0,
-        "chests": 0,
-        "doors": 0,
-        "buttons": 0,
-        "levers": 0,
-        "trapdoors": 0
+        "pve": 1,
+        "build": 1,
+        "chests": 1,
+        "doors": 1,
+        "buttons": 1,
+        "levers": 1,
+        "trapdoors": 1
     },
     "rule": {
         "teleport": true,

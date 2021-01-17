@@ -551,6 +551,7 @@ class Plugin(BasePlugin):
                 )
 
     def on_liquid_spreads(self, event, mage):
+        # print(">> BlockFromToEvent")
         to_chunk = event.getToBlock().getChunk()
         to_town = self.get_town_by_coords(to_chunk.getX(), to_chunk.getZ())
         if to_town:
@@ -597,3 +598,27 @@ class Plugin(BasePlugin):
             raise PlayerErrorMessage(
                 "PvE is forbidden in {}".format(town.name), mage.player,
             )
+
+    def can_piston_move(self, event):
+        bukkit_chunk = event.block.location.chunk
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+
+        for block in event.getBlocks():
+
+            if town != self.claims_by_loc[block.location.chunk.getX()].get(
+                block.location.chunk.getZ(), self.wilderness
+            ):
+                return False
+        return True
+
+    def on_piston_extend(self, event, mage):
+        # print(">> BlockPistonExtendEvent")
+        if not self.can_piston_move(event):
+            event.setCancelled(True)
+
+    def on_piston_retract(self, event, mage):
+        # print(">> BlockPistonRetractEvent")
+        if not self.can_piston_move(event):
+            event.setCancelled(True)
