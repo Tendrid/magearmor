@@ -23,12 +23,11 @@ from org.bukkit.entity import (
     ItemFrame,
 )
 from org.bukkit.event.player.PlayerTeleportEvent import TeleportCause
-from org.bukkit.Material import ARMOR_STAND
 from org.bukkit.entity.EntityType import WITHER
 from org.bukkit.event.block import Action
 from org.bukkit.inventory import EquipmentSlot
 
-from core.collections import DOORS, TRAPDOORS, BUTTONS, PRESSUREPLATES
+from core.collections import DOORS, TRAPDOORS, BUTTONS, ENTITY_ITEMS
 from org.bukkit.Material import LEVER
 
 from org.bukkit.event.entity.CreatureSpawnEvent import SpawnReason
@@ -475,7 +474,7 @@ class Plugin(BasePlugin):
             # check for armor stand placement last
             elif (
                 not self.check_town_permission(mage, town, "build")
-                and mage.player.getItemInHand().getType() == ARMOR_STAND
+                and mage.player.getItemInHand().getType() in ENTITY_ITEMS
             ):
                 event.setCancelled(True)
                 raise PlayerErrorMessage(

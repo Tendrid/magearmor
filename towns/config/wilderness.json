@@ -1,7 +1,7 @@
 {
     "name": "Wilderness",
     "permissions": {
-        "pve":0,
+        "pve": 0,
         "build": 0,
         "chests": 0,
         "doors": 0,

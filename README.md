@@ -1,6 +1,6 @@
 # magearmor
 Python plugin system for magearmor.com minecraft server
-
+/gamerule doFireTick false
 
 # Battles:Modified
 Every damage event in the game now has a set of carrier damages, which means when a weapon does 5 damage, it can be "piercing" damage (such as an arrow).  A weapon strike can have one, or no carrier types from one of each of the following damage classes:
