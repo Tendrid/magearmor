@@ -28,9 +28,7 @@ from org.bukkit.event.player import (
     PlayerTeleportEvent,
     PlayerInteractEntityEvent,
 )
-from org.bukkit.event.entity import EntityExplodeEvent
-from org.bukkit.event.entity import EntityChangeBlockEvent
-
+from org.bukkit.event.entity import EntityExplodeEvent, EntityChangeBlockEvent
 
 CALLBACKS_METHODS = {
     "on_player_join": PlayerJoinEvent,

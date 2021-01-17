@@ -22,6 +22,9 @@ from org.bukkit.entity import (
     Creeper,
     ItemFrame,
     LeashHitch,
+    LivingEntity,
+    Sheep,
+    Vehicle,
 )
 from org.bukkit.event.player.PlayerTeleportEvent import TeleportCause
 from org.bukkit.entity.EntityType import WITHER
@@ -494,25 +497,45 @@ class Plugin(BasePlugin):
         #         event.setCancelled(True)
 
     def on_player_interact_with_entity(self, event, mage):
-        print(">> PlayerInteractEntityEvent")
+        # print(">> PlayerInteractEntityEvent")
         hand = event.getHand()
         if hand == EquipmentSlot.HAND:
-            # check if armor stand
             entity = event.getRightClicked()
             bukkit_chunk = entity.getLocation().getChunk()
             town = self.claims_by_loc[bukkit_chunk.getX()].get(
                 bukkit_chunk.getZ(), self.wilderness
             )
-            if not self.check_town_permission(mage, town, "build"):
-                if isinstance(entity, ItemFrame):
-                    event.setCancelled(True)
-                    raise PlayerErrorMessage(
-                        "You do not have permission to build in {}".format(town.name)
-                    )
-            if not self.check_town_permission(mage, town, "pve"):
-                if isinstance(entity, LeashHitch):
-                    event.setCancelled(True)
-                    raise PlayerErrorMessage("PvE is forbidden in {}".format(town.name))
+            # check if using an armor stand
+            if isinstance(entity, ItemFrame) and not self.check_town_permission(
+                mage, town, "build"
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to build in {}".format(town.name)
+                )
+
+            # check if unleashing animal
+            if isinstance(entity, LeashHitch) and not self.check_town_permission(
+                mage, town, "pve"
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage("PvE is forbidden in {}".format(town.name))
+
+            # check if they're trying to mount an animal
+            if (
+                isinstance(entity, Vehicle)
+                and isinstance(entity, LivingEntity)
+                and not self.check_town_permission(mage, town, "pve")
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage("PvE is forbidden in {}".format(town.name))
+
+            # check if sheering or coloring sheep
+            if isinstance(entity, Sheep) and not self.check_town_permission(
+                mage, town, "pve"
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage("PvE is forbidden in {}".format(town.name))
 
     def on_player_teleport(self, event, mage):
         # print(">> PlayerTeleportEvent")
