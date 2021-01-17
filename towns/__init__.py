@@ -21,6 +21,7 @@ from org.bukkit.entity import (
     AbstractVillager,
     Creeper,
     ItemFrame,
+    LeashHitch,
 )
 from org.bukkit.event.player.PlayerTeleportEvent import TeleportCause
 from org.bukkit.entity.EntityType import WITHER
@@ -288,7 +289,7 @@ class Plugin(BasePlugin):
         # check for chests role
         # print(">> InventoryOpenEvent")
         inventory = event.getInventory()
-        bukkit_chunk = inventory.getLocation().getChunk()
+        bukkit_chunk = inventory.getHolder().getLocation().getChunk()
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
             bukkit_chunk.getZ(), self.wilderness
         )
@@ -493,7 +494,7 @@ class Plugin(BasePlugin):
         #         event.setCancelled(True)
 
     def on_player_interact_with_entity(self, event, mage):
-        # print(">> PlayerInteractEntityEvent")
+        print(">> PlayerInteractEntityEvent")
         hand = event.getHand()
         if hand == EquipmentSlot.HAND:
             # check if armor stand
@@ -508,6 +509,10 @@ class Plugin(BasePlugin):
                     raise PlayerErrorMessage(
                         "You do not have permission to build in {}".format(town.name)
                     )
+            if not self.check_town_permission(mage, town, "pve"):
+                if isinstance(entity, LeashHitch):
+                    event.setCancelled(True)
+                    raise PlayerErrorMessage("PvE is forbidden in {}".format(town.name))
 
     def on_player_teleport(self, event, mage):
         # print(">> PlayerTeleportEvent")
@@ -557,3 +562,15 @@ class Plugin(BasePlugin):
         if town and event.getEntityType() == WITHER and not town.get_rule("wither"):
             event.getEntity().remove()
             event.setCancelled(True)
+
+    def on_player_leash_entity(self, event, mage):
+        entity = event.getEntity()
+        bukkit_chunk = entity.getLocation().getChunk()
+        town = self.claims_by_loc[bukkit_chunk.getX()].get(
+            bukkit_chunk.getZ(), self.wilderness
+        )
+        if mage and not self.check_town_permission(mage, town, "pve"):
+            event.setCancelled(True)
+            raise PlayerErrorMessage(
+                "PvE is forbidden in {}".format(town.name), mage.player,
+            )
