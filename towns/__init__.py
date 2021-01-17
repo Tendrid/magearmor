@@ -26,13 +26,14 @@ from org.bukkit.entity import (
     Sheep,
     Vehicle,
 )
+from org.bukkit import Nameable
 from org.bukkit.event.player.PlayerTeleportEvent import TeleportCause
 from org.bukkit.entity.EntityType import WITHER
 from org.bukkit.event.block import Action
 from org.bukkit.inventory import EquipmentSlot
 
 from core.collections import DOORS, TRAPDOORS, BUTTONS, ENTITY_ITEMS
-from org.bukkit.Material import LEVER
+from org.bukkit.Material import LEVER, NAME_TAG
 
 from org.bukkit.event.entity.CreatureSpawnEvent import SpawnReason
 
@@ -291,16 +292,17 @@ class Plugin(BasePlugin):
     def on_player_opens_inventory(self, event, mage):
         # check for chests role
         # print(">> InventoryOpenEvent")
-        inventory = event.getInventory()
-        bukkit_chunk = inventory.getHolder().getLocation().getChunk()
-        town = self.claims_by_loc[bukkit_chunk.getX()].get(
-            bukkit_chunk.getZ(), self.wilderness
-        )
-        if town and not self.check_town_permission(mage, town, "chests"):
-            event.setCancelled(True)
-            raise PlayerErrorMessage(
-                "You do not have permission to open chests in {}".format(town.name)
+        holder = event.getInventory().getHolder()
+        if hasattr(holder, "getLocation"):
+            bukkit_chunk = holder.getLocation().getChunk()
+            town = self.claims_by_loc[bukkit_chunk.getX()].get(
+                bukkit_chunk.getZ(), self.wilderness
             )
+            if town and not self.check_town_permission(mage, town, "chests"):
+                event.setCancelled(True)
+                raise PlayerErrorMessage(
+                    "You do not have permission to open chests in {}".format(town.name)
+                )
 
     def on_entity_destroys_vehicle(self, event, mage):
         # check for build role
@@ -478,26 +480,15 @@ class Plugin(BasePlugin):
             # check for armor stand placement last
             elif (
                 not self.check_town_permission(mage, town, "build")
-                and mage.player.getItemInHand().getType() in ENTITY_ITEMS
+                and mage.player.inventory.getItemInMainHand().getType() in ENTITY_ITEMS
             ):
                 event.setCancelled(True)
                 raise PlayerErrorMessage(
                     "You do not have permission to build in {}".format(town.name)
                 )
-        # elif action == Action.PHYSICAL:
-        #     block = event.getClickedBlock()
-        #     material = block.getType()
-        #     bukkit_chunk = block.getLocation().getChunk()
-        #     town = self.claims_by_loc[bukkit_chunk.getX()].get(
-        #         bukkit_chunk.getZ(), self.wilderness
-        #     )
-        #     if material in PRESSUREPLATES and not self.check_town_permission(
-        #         mage, town, "plates"
-        #     ):
-        #         event.setCancelled(True)
 
     def on_player_interact_with_entity(self, event, mage):
-        # print(">> PlayerInteractEntityEvent")
+        # name print(">> PlayerInteractEntityEvent")
         hand = event.getHand()
         if hand == EquipmentSlot.HAND:
             entity = event.getRightClicked()
@@ -505,6 +496,15 @@ class Plugin(BasePlugin):
             town = self.claims_by_loc[bukkit_chunk.getX()].get(
                 bukkit_chunk.getZ(), self.wilderness
             )
+
+            if (
+                isinstance(entity, Nameable)
+                and mage.inventory.getItemInMainHand().getType() == NAME_TAG
+                and not self.check_town_permission(mage, town, "pve")
+            ):
+                event.setCancelled(True)
+                raise PlayerErrorMessage("PvE is forbidden in {}".format(town.name))
+
             # check if using an armor stand
             if isinstance(entity, ItemFrame) and not self.check_town_permission(
                 mage, town, "build"
