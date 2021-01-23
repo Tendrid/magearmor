@@ -15,6 +15,7 @@ from com.denizenscript.depenizen.bukkit.bungee.packets.out import (
 )
 
 from org.bukkit.inventory import ItemStack
+from datetime import datetime
 
 
 class Mage(DataStorage):
@@ -30,7 +31,6 @@ class Mage(DataStorage):
 
     def logoff(self):
         self.save_inventory()
-        self.save()
         self.__player = SERVER.getOfflinePlayer(UUID.fromString(self.uuid))
 
     @property
@@ -75,6 +75,7 @@ class Mage(DataStorage):
             else:
                 inventory.append(stack)
         self.inventory.setContents(inventory)
+        print("LOADED INVENTORY", datetime.now())
 
     def save_inventory(self):
         self.data["inventory"] = []
@@ -83,11 +84,12 @@ class Mage(DataStorage):
                 self.data["inventory"].append(list(stack.serializeAsBytes()))
             else:
                 self.data["inventory"].append(None)
+        self.save()
+        print("SAVED INVENTORY", datetime.now())
 
     def teleport(self, dimension_name):
         # save _before_ we do any teleporting to avoid race conditions
         self.save_inventory()
-        self.save()
         # adjust players location on target server
         adjust_cmd = 'ex bungee {} {{ - adjust <p@{}> "location:<l@0.5,100,0.5,0,0,world>" }}'.format(
             dimension_name, self.uuid
