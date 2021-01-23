@@ -4,6 +4,7 @@ from mcapi import SERVER
 from core.storage import IndexStorage
 from mage import Mage
 from dimension import Dimension
+from core.mageworld import MageWorld
 
 from com.denizenscript.depenizen.bukkit.bungee import BungeeBridge
 
@@ -21,13 +22,14 @@ class Plugin(BasePlugin):
 
     @asynchronous()
     def on_player_join(self, event, mage):
-        mage.login(event.getPlayer())
         self.refresh_servers()
+        mage.login(event.getPlayer())
 
     def refresh_servers(self):
         if BungeeBridge.instance:
             for server_name in BungeeBridge.instance.knownServers:
                 self.servers.get_or_create(str(server_name))
+            MageWorld.dimension = self.servers.get(BungeeBridge.instance.serverName)
 
     @asynchronous()
     def on_player_quit(self, event, mage):

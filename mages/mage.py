@@ -1,4 +1,5 @@
 from core.mageworld import MageWorld
+from core.exceptions import PlayerErrorMessage
 from core.storage import DataStorage
 from mcapi import SERVER
 
@@ -15,7 +16,6 @@ from com.denizenscript.depenizen.bukkit.bungee.packets.out import (
 )
 
 from org.bukkit.inventory import ItemStack
-from datetime import datetime
 
 
 class Mage(DataStorage):
@@ -27,10 +27,12 @@ class Mage(DataStorage):
     def login(self, player=None):
         self.__player = player or SERVER.getPlayer(self.uuid)
         self.load()
+        self.data["dimension"] = MageWorld.dimension.uuid
         self.load_inventory()
 
     def logoff(self):
-        self.save_inventory()
+        if self.data["dimension"] == MageWorld.dimension.uuid:
+            self.save_inventory()
         self.__player = SERVER.getOfflinePlayer(UUID.fromString(self.uuid))
 
     @property
@@ -68,7 +70,6 @@ class Mage(DataStorage):
                 self.data[k] = v
 
     def load_inventory(self):
-        print("LOADING INVENTORY", datetime.now())
         inventory = []
         for stack in self.data["inventory"]:
             if stack:
@@ -76,10 +77,8 @@ class Mage(DataStorage):
             else:
                 inventory.append(stack)
         self.inventory.setContents(inventory)
-        print("LOADED INVENTORY", datetime.now())
 
     def save_inventory(self):
-        print("SAVING INVENTORY", datetime.now())
         self.data["inventory"] = []
         for stack in self.inventory.getContents():
             if stack:
@@ -87,10 +86,13 @@ class Mage(DataStorage):
             else:
                 self.data["inventory"].append(None)
         self.save()
-        print("SAVED INVENTORY", datetime.now())
 
     def teleport(self, dimension_name):
+        dimension_names = [uuid for uuid, server in MageWorld.plugins["mages"].servers]
+        if dimension_name not in dimension_names:
+            raise PlayerErrorMessage("Unknown Dimension")
         # save _before_ we do any teleporting to avoid race conditions
+        self.data["dimension"] = dimension_name
         self.save_inventory()
         # adjust players location on target server
         adjust_cmd = 'ex bungee {} {{ - adjust <p@{}> "location:<l@0.5,100,0.5,0,0,world>" }}'.format(

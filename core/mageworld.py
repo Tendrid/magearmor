@@ -33,7 +33,7 @@ class EventListener(Listener):
 
 
 class WorldInstance(object):
-    dimensions = []
+    dimension = None
     world = SERVER.getWorlds().get(0)
     players = {}
     config = {}
