@@ -85,6 +85,9 @@ class Mage(DataStorage):
                 self.data["inventory"].append(None)
 
     def teleport(self, dimension_name):
+        # save _before_ we do any teleporting to avoid race conditions
+        self.save_inventory()
+        self.save()
         # adjust players location on target server
         adjust_cmd = 'ex bungee {} {{ - adjust <p@{}> "location:<l@0.5,100,0.5,0,0,world>" }}'.format(
             dimension_name, self.uuid
