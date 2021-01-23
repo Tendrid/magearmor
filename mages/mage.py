@@ -68,6 +68,7 @@ class Mage(DataStorage):
                 self.data[k] = v
 
     def load_inventory(self):
+        print("LOADING INVENTORY", datetime.now())
         inventory = []
         for stack in self.data["inventory"]:
             if stack:
@@ -78,6 +79,7 @@ class Mage(DataStorage):
         print("LOADED INVENTORY", datetime.now())
 
     def save_inventory(self):
+        print("SAVING INVENTORY", datetime.now())
         self.data["inventory"] = []
         for stack in self.inventory.getContents():
             if stack:
