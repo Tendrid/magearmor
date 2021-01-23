@@ -9,3 +9,10 @@ from core.exceptions import PlayerErrorMessage
 def command_tp(mage, command):
     if command:
         mage.teleport(command[0])
+    else:
+        mage.player.sendMessage("/mages-tp <dimension>")
+        mage.player.sendMessage(
+            "Available Dimensions: {}".format(
+                [name for name, dimension in MageWorld.plugins["mages"].servers]
+            )
+        )
