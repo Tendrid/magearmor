@@ -193,7 +193,6 @@ class Plugin(BasePlugin):
         # player_uuid = str(event.getPlayer().getUniqueId())
         # pd = self.player_data.get(player_uuid)
         # pd.save()
-        mage.save()
         town = self.get_town_by_player_uuid(mage.uuid)
         if town:
             self.towns.get(town.uuid).save()

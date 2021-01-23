@@ -31,6 +31,7 @@ class EventListener(Listener):
 
 
 class WorldInstance(object):
+    dimensions = []
     world = SERVER.getWorlds().get(0)
     players = {}
     config = {}

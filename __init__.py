@@ -28,6 +28,7 @@ MageWorld.load_plugin(battles.Plugin)
 ### Import Commands #############################
 # from mages import commands
 from towns import commands
+from mages import commands
 
 
 ### Run Tests ###################################
