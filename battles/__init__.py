@@ -83,7 +83,9 @@ class Plugin(BasePlugin):
         player_armor = {x: [] for x in self.config["damage_types"].keys()}
 
         modifiers = [
-            self.materials.get(x.getType()) if x else self.default_armor
+            self.materials.get(x.getType()) or self.default_armor
+            if x
+            else self.default_armor
             for x in mage.inventory.getArmorContents()
         ]
 
