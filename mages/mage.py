@@ -53,6 +53,9 @@ class Mage(DataStorage):
     def inventory(self):
         return self.player.getInventory()
 
+    def clear_data(self, data):
+        return {"inventory": []}
+
     def load_inventory(self):
         inventory = []
         for stack in self.data["inventory"]:
