@@ -18,7 +18,9 @@ class EventListener(Listener):
     def execute(self, event):
         mage = None
         if hasattr(event, "getPlayer"):
-            mage = MageWorld.get_mage(str(event.getPlayer().getUniqueId()))
+            mage = MageWorld.plugins["mages"].mages.get_or_create(
+                str(event.getPlayer().getUniqueId())
+            )
         try:
             self.func(event, mage)
         except PlayerErrorMessage as e:
@@ -57,7 +59,7 @@ class WorldInstance(object):
         return listener
 
     def get_mage(self, player_id):
-        return self.plugins["mages"].mages.get_or_create(player_id)
+        return self.plugins["mages"].mages.get(player_id)
 
     def get_mage_by_name(self, player_name):
         mages = self.plugins["mages"].mages.get_by("name", player_name)

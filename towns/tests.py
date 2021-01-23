@@ -56,21 +56,6 @@ class TestTownFiles(unittest.TestCase):
 
         os.remove(mage_town.path)
 
-    def test_town_id_from_mage(self):
-        mage = MageWorld.mage_join(PLAYER_TENDRID)
-
-        self.assertEquals(str(mage.player.getUniqueId()), PLAYER_TENDRID)
-
-        plugin = MageWorld.plugins[Plugin.lib_name]
-        plugin.load()
-        town_obj = plugin.get_town_by_player_uuid(mage.uuid)
-
-        self.assertNotEquals(town_obj, None)
-
-        self.assertIsInstance(town_obj, Town)
-
-        self.assertNotEquals(town_obj.uuid, None)
-
     def test_b1_town_create(self):
         mage = MageWorld.mage_join(PLAYER_NOTCH)
 
@@ -79,17 +64,11 @@ class TestTownFiles(unittest.TestCase):
         # make sure player does not own a town
         self.assertEquals(plugin.get_town_by_player_uuid(mage.uuid), None)
 
-        # Fail claim when not an owner
-        with self.assertRaises(PlayerErrorMessage) as claim_exception:
-            # XXX TODO: currently, there is no check against world ID for towns.
-            plugin.claim(mage, 0, 0, "00000000-0000-0000-0000-000000000000")
-        self.assertEquals(
-            claim_exception.exception.message,
-            "This plot is already clamed by Sanctuary",
-        )
-
         # create a new town
         TestTownFiles.town = plugin.create_town(mage)
+
+        # make sure player now owns a town
+        self.assertEquals(plugin.get_town_by_player_uuid(mage.uuid), TestTownFiles.town)
 
         self.assertEquals(len(TestTownFiles.town.data["members"].keys()), 0)
 

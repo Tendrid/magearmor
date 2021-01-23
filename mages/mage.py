@@ -26,10 +26,10 @@ class Mage(DataStorage):
     def login(self):
         self.__player = SERVER.getPlayer(self.uuid)
         self.load()
-        self.load_inventory()
+        # self.load_inventory()
 
     def logoff(self):
-        self.save_inventory()
+        # self.save_inventory()
         self.save()
         self.__player = SERVER.getOfflinePlayer(UUID.fromString(self.uuid))
 
