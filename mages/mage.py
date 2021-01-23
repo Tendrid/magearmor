@@ -53,8 +53,19 @@ class Mage(DataStorage):
     def inventory(self):
         return self.player.getInventory()
 
-    def clear_data(self, data):
-        return {"inventory": []}
+    def set_data(self, data):
+        # set town defaults
+        self.data = MageWorld.get_config("mages", "default_mage")
+        # override defaults with town settings
+        self.data.update(data)
+
+        # add new second level items
+        for k, v in MageWorld.get_config("mages", "default_mage").items():
+            if not self.data.get(k):
+                self.data[k] = v
+            elif type(self.data[k]) is dict:
+                v.update(self.data[k])
+                self.data[k] = v
 
     def load_inventory(self):
         inventory = []
