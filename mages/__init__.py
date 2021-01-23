@@ -21,7 +21,7 @@ class Plugin(BasePlugin):
 
     @asynchronous()
     def on_player_join(self, event, mage):
-        mage.login()
+        mage.login(event.getPlayer())
         self.refresh_servers()
 
     def refresh_servers(self):
