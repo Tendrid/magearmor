@@ -1,37 +1,31 @@
-## Welcome to GitHub Pages
+# Magearmor Minecraft Overview
 
-You can use the [editor on GitHub](https://github.com/Tendrid/magearmor/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+Magearmor.com is a community minecraft server for the [Tinakitten](https://www.twitch.tv/tinakitten) discord. 
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Plugins
 
-### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### Towns
+The towns plugin allows everyone to protect their build area.  Once you create a town, you can add plots to it (each plot is a minecraft chunk, 16x16 blocks).  All towns start with 9 plots they can claim, but you can gain more in the future.  All plots must be adjacent to a plot already claimed.
 
-```markdown
-Syntax highlighted code block
+`/towns-create`
+This command will create a town for you, but it will not claim any spaces.  Its simply where you get started
 
-# Header 1
-## Header 2
-### Header 3
+`/towns-name <town name>`
+All towns start with the name "Village".  To rename your town, use `\towns-name My New Name`, which would rename your town to "My New Name".  You can do this as often as you'd like.
 
-- Bulleted
-- List
+`/towns-claim`
+When you use this command, it will immediately claim the chunk in which you are standing.  If the chunk is not adjacent to a chunk already claimed, you will see an error message, and the chunk will not be claimed.
 
-1. Numbered
-2. List
+`/towns-unclaim`
+using this will unclaim a plot in your town.
 
-**Bold** and _Italic_ and `Code` text
+`/towns-permissions (<permission_name> <rank_name>)`
+This command, when typed on its own, will list your towns current permission settings.  If you provide this command with a permission name, and a new rank, the permission will change.
 
-[Link](url) and ![Image](src)
-```
+`/towns-ranks (<rank_name> <new_rank_name>)`
+This command, when types on its own, will list your towns current ranks.  If you provide this command with a rank name, and a new name, it will change that ranks name.
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+`/towns-add-member <playername>`
+using this command will add the player to your town.  Once they are a member of your town, you can change their rank (not yet available as a command. comming soon!)
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Tendrid/magearmor/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
