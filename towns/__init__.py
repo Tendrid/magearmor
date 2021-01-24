@@ -152,7 +152,8 @@ class Plugin(BasePlugin):
         self.player_data = IndexStorage(self.lib_name, "players")
         self.towns = IndexStorage(self.lib_name, "towns", Town)
         for town_uuid, town in self.towns:
-            self.towns_by_player[town.data["owner"]] = town
+            if town.data["owner"]:
+                self.towns_by_player[town.data["owner"]] = town
             for chunk in town.data.get("chunks"):
                 self.claims_by_loc[chunk[0]][chunk[1]] = town
         # run towns_fix_cuboids
