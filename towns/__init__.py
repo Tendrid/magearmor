@@ -38,6 +38,10 @@ from org.bukkit.Material import LEVER, NAME_TAG
 from org.bukkit.event.entity.CreatureSpawnEvent import SpawnReason
 
 
+def hack_func_for_overworld(thing):
+    return thing.getWorld().getName() in ["world_nether", "world_the_end"]
+
+
 class Wilderness(Town):
     def __init__(self, *args, **kwargs):
         self.set_data(MageWorld.get_config("towns", "wilderness"))
@@ -108,7 +112,11 @@ class Plugin(BasePlugin):
             )
 
         town.add_chunk(
-            int(x), int(z), str(world_uuid), plot_type, mage.uuid,
+            int(x),
+            int(z),
+            str(world_uuid),
+            plot_type,
+            mage.uuid,
         )
 
         self.claims_by_loc[x][z] = town
@@ -202,7 +210,8 @@ class Plugin(BasePlugin):
 
     def on_player_breaks_block(self, event, mage):
         # print(">> BlockBreakEvent")
-
+        if hack_func_for_overworld(mage.player):
+            return
         block = event.getBlock()
         bukkit_chunk = block.getLocation().getChunk()
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
@@ -216,6 +225,9 @@ class Plugin(BasePlugin):
 
     def on_block_can_build(self, event, mage):
         # print(">> BlockCanBuildEvent")
+        if hack_func_for_overworld(mage.player):
+            return
+
         block = event.getBlock()
         bukkit_chunk = block.getLocation().getChunk()
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
@@ -239,6 +251,8 @@ class Plugin(BasePlugin):
         # print(">> HangingBreakEvent")
 
         hanging_entity = event.getEntity()
+        if hack_func_for_overworld(hanging_entity):
+            return
         player = None
         if hasattr(event, "getRemover"):
             player = event.getRemover()
@@ -265,6 +279,8 @@ class Plugin(BasePlugin):
         # check for build role
         # print(">> HangingPlaceEvent")
         hanging_entity = event.getEntity()
+        if hack_func_for_overworld(hanging_entity):
+            return
         bukkit_chunk = hanging_entity.getLocation().getChunk()
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
             bukkit_chunk.getZ(), self.wilderness
@@ -279,6 +295,9 @@ class Plugin(BasePlugin):
         # check for build role
         # print(">> PlayerArmorStandManipulateEvent")
         armor_stand_entity = event.getRightClicked()
+        if hack_func_for_overworld(armor_stand_entity):
+            return
+
         bukkit_chunk = armor_stand_entity.getLocation().getChunk()
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
             bukkit_chunk.getZ(), self.wilderness
@@ -293,6 +312,9 @@ class Plugin(BasePlugin):
         # check for chests role
         # print(">> InventoryOpenEvent")
         holder = event.getInventory().getHolder()
+        if hack_func_for_overworld(holder):
+            return
+
         if hasattr(holder, "getLocation"):
             bukkit_chunk = holder.getLocation().getChunk()
             town = self.claims_by_loc[bukkit_chunk.getX()].get(
@@ -308,6 +330,8 @@ class Plugin(BasePlugin):
         # check for build role
         # print(">> VehicleDestroyEvent")
         player = event.getAttacker()
+        if hack_func_for_overworld(player):
+            return
         if isinstance(player, Player):
             cart_entity = event.getVehicle()
             mage = MageWorld.get_mage(str(player.getUniqueId()))
@@ -329,6 +353,9 @@ class Plugin(BasePlugin):
         # check for build role
         # print(">> PlayerBucketEmptyEvent")
         block = event.getBlock()
+        if hack_func_for_overworld(block):
+            return
+
         bukkit_chunk = block.getLocation().getChunk()
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
             bukkit_chunk.getZ(), self.wilderness
@@ -342,6 +369,9 @@ class Plugin(BasePlugin):
     def on_player_fills_bucket(self, event, mage):
         # print(">> PlayerBucketFillEvent")
         block = event.getBlock()
+        if hack_func_for_overworld(block):
+            return
+
         bukkit_chunk = block.getLocation().getChunk()
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
             bukkit_chunk.getZ(), self.wilderness
@@ -358,6 +388,9 @@ class Plugin(BasePlugin):
 
         damager = event.getDamager() if hasattr(event, "getDamager") else None
         target = event.getEntity()
+        if hack_func_for_overworld(target):
+            return
+
         # if damager is player:
         if isinstance(damager, Player) or isinstance(damager, TNTPrimed):
             mage = MageWorld.get_mage(str(damager.getUniqueId()))
@@ -376,7 +409,8 @@ class Plugin(BasePlugin):
                 if not town.get_rule("pvp"):
                     event.setCancelled(True)
                     raise PlayerErrorMessage(
-                        "PvP is forbidden in {}".format(town.name), mage.player,
+                        "PvP is forbidden in {}".format(town.name),
+                        mage.player,
                     )
             elif isinstance(target, ArmorStand):
                 if not self.check_town_permission(mage, town, "build"):
@@ -395,7 +429,8 @@ class Plugin(BasePlugin):
                 if not self.check_town_permission(mage, town, "pve"):
                     event.setCancelled(True)
                     raise PlayerErrorMessage(
-                        "PvE is forbidden in {}".format(town.name), mage.player,
+                        "PvE is forbidden in {}".format(town.name),
+                        mage.player,
                     )
         elif isinstance(damager, Creeper):
             location = target.getLocation()
@@ -415,6 +450,8 @@ class Plugin(BasePlugin):
         # check mob spawn
         # print(">> EntitySpawnEvent")
         entity = event.getEntity()
+        if hack_func_for_overworld(entity):
+            return
 
         location = event.getLocation()
         bukkit_chunk = location.getChunk()
@@ -438,6 +475,9 @@ class Plugin(BasePlugin):
     def on_player_interact(self, event, mage):
         # Action.RIGHT_CLICK_BLOCK, Action.PHYSICAL, Action.LEFT_CLICK_BLOCK
         # print(">> PlayerInteractEvent")
+        if hack_func_for_overworld(mage.player):
+            return
+
         action = event.getAction()
         if action == Action.RIGHT_CLICK_BLOCK:
             # check if armor stand
@@ -489,6 +529,8 @@ class Plugin(BasePlugin):
 
     def on_player_interact_with_entity(self, event, mage):
         # name print(">> PlayerInteractEntityEvent")
+        if hack_func_for_overworld(mage.player):
+            return
         hand = event.getHand()
         if hand == EquipmentSlot.HAND:
             entity = event.getRightClicked()
@@ -539,6 +581,8 @@ class Plugin(BasePlugin):
 
     def on_player_teleport(self, event, mage):
         # print(">> PlayerTeleportEvent")
+        if hack_func_for_overworld(mage.player):
+            return
         if event.getCause() == TeleportCause.ENDER_PEARL:
             bukkit_chunk = event.getTo().getChunk()
             town = self.claims_by_loc[bukkit_chunk.getX()].get(
@@ -553,6 +597,8 @@ class Plugin(BasePlugin):
     def on_liquid_spreads(self, event, mage):
         # print(">> BlockFromToEvent")
         to_chunk = event.getToBlock().getChunk()
+        if hack_func_for_overworld(to_chunk):
+            return
         to_town = self.get_town_by_coords(to_chunk.getX(), to_chunk.getZ())
         if to_town:
             from_chunk = event.getBlock().getChunk()
@@ -562,6 +608,8 @@ class Plugin(BasePlugin):
 
     def on_entity_explode(self, event, mage):
         damager = event.getEntity()
+        if hack_func_for_overworld(damager):
+            return
         for block in event.blockList():
             bukkit_chunk = block.getLocation().getChunk()
 
@@ -579,6 +627,8 @@ class Plugin(BasePlugin):
 
     def on_entity_change_block(self, event, mage):
         block = event.getBlock()
+        if hack_func_for_overworld(block):
+            return
         bukkit_chunk = block.getLocation().getChunk()
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
             bukkit_chunk.getZ(), self.wilderness
@@ -589,6 +639,8 @@ class Plugin(BasePlugin):
 
     def on_player_leash_entity(self, event, mage):
         entity = event.getEntity()
+        if hack_func_for_overworld(entity):
+            return
         bukkit_chunk = entity.getLocation().getChunk()
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
             bukkit_chunk.getZ(), self.wilderness
@@ -596,11 +648,14 @@ class Plugin(BasePlugin):
         if mage and not self.check_town_permission(mage, town, "pve"):
             event.setCancelled(True)
             raise PlayerErrorMessage(
-                "PvE is forbidden in {}".format(town.name), mage.player,
+                "PvE is forbidden in {}".format(town.name),
+                mage.player,
             )
 
     def can_piston_move(self, event):
         bukkit_chunk = event.block.location.chunk
+        if hack_func_for_overworld(bukkit_chunk):
+            return true
         town = self.claims_by_loc[bukkit_chunk.getX()].get(
             bukkit_chunk.getZ(), self.wilderness
         )

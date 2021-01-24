@@ -21,6 +21,7 @@ def command_claim(mage, command):
         bukkit_chunk.getZ(),
         bukkit_chunk.getWorld().getUID(),
     )
+    mage.player.sendMessage("Plot claimed")
 
 
 @register_command(Plugin.lib_name, "unclaim")
@@ -34,12 +35,14 @@ def command_unclaim(mage, command):
         bukkit_chunk.getZ(),
         bukkit_chunk.getWorld().getUID(),
     )
+    mage.player.sendMessage("Plot unclaimed")
 
 
 @register_command(Plugin.lib_name, "create")
 def command_create(mage, command):
     only_kingdoms()
     MageWorld.plugins["towns"].create_town(mage)
+    mage.player.sendMessage("Village created!")
 
 
 @register_command(Plugin.lib_name, "name")
