@@ -95,10 +95,11 @@ class Mage(DataStorage):
         self.data["dimension"] = dimension_name
         self.save_inventory()
         # adjust players location on target server
-        adjust_cmd = 'ex bungee {} {{ - adjust <p@{}> "location:<l@0.5,76,0.5,0,0,world>" }}'.format(
-            dimension_name, self.uuid
-        )
-        SERVER.dispatchCommand(SERVER.getConsoleSender(), adjust_cmd)
+        # REMOVED ADJUST FOR NOW
+        # adjust_cmd = 'ex bungee {} {{ - adjust <p@{}> "location:<l@0.5,76,0.5,0,0,world>" }}'.format(
+        #     dimension_name, self.uuid
+        # )
+        # SERVER.dispatchCommand(SERVER.getConsoleSender(), adjust_cmd)
 
         # send command to bungee
         cmd = ExecuteCommandPacketOut("send {} {}".format(self.name, dimension_name))
