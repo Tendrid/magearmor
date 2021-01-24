@@ -5,8 +5,14 @@ from . import Plugin
 from core.exceptions import PlayerErrorMessage
 
 
+def only_kingdoms():
+    if MageWorld.dimension.uuid != "kingdoms":
+        raise PlayerErrorMessage("Towns only available in kingdoms right now")
+
+
 @register_command(Plugin.lib_name, "claim")
 def command_claim(mage, command):
+    only_kingdoms()
     bukkit_chunk = mage.location.getChunk()
 
     MageWorld.plugins["towns"].claim(
@@ -19,6 +25,7 @@ def command_claim(mage, command):
 
 @register_command(Plugin.lib_name, "unclaim")
 def command_unclaim(mage, command):
+    only_kingdoms()
     bukkit_chunk = mage.location.getChunk()
 
     MageWorld.plugins["towns"].unclaim(
@@ -31,11 +38,13 @@ def command_unclaim(mage, command):
 
 @register_command(Plugin.lib_name, "create")
 def command_create(mage, command):
+    only_kingdoms()
     MageWorld.plugins["towns"].create_town(mage)
 
 
 @register_command(Plugin.lib_name, "name")
 def command_name(mage, command):
+    only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
     if not town:
         raise PlayerErrorMessage("You must make a town before you can set the name")
@@ -46,6 +55,7 @@ def command_name(mage, command):
 
 @register_command(Plugin.lib_name, "permissions")
 def command_permissions(mage, command):
+    only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
     if not town:
         raise PlayerErrorMessage("You do not own a town")
@@ -62,6 +72,7 @@ def command_permissions(mage, command):
 
 @register_command(Plugin.lib_name, "ranks")
 def command_ranks(mage, command):
+    only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
     if not town:
         raise PlayerErrorMessage("You do not own a town")
@@ -78,6 +89,7 @@ def command_ranks(mage, command):
 
 @register_command(Plugin.lib_name, "add-member")
 def command_add_member(mage, command):
+    only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
     if not town:
         raise PlayerErrorMessage("You do not own a town")
