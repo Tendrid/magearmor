@@ -12,7 +12,7 @@ The towns plugin allows everyone to protect their build area.  Once you create a
 This command will create a town for you, but it will not claim any spaces.  Its simply where you get started
 
 `/towns-name <town name>`
-All towns start with the name "Village".  To rename your town, use `\towns-name My New Name`, which would rename your town to "My New Name".  You can do this as often as you'd like.
+All towns start with the name "Village".  To rename your town, use `/towns-name My New Name`, which would rename your town to "My New Name".  You can do this as often as you'd like.
 
 `/towns-claim`
 When you use this command, it will immediately claim the chunk in which you are standing.  If the chunk is not adjacent to a chunk already claimed, you will see an error message, and the chunk will not be claimed.
