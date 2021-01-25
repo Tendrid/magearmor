@@ -112,11 +112,7 @@ class Plugin(BasePlugin):
             )
 
         town.add_chunk(
-            int(x),
-            int(z),
-            str(world_uuid),
-            plot_type,
-            mage.uuid,
+            int(x), int(z), str(world_uuid), plot_type, mage.uuid,
         )
 
         self.claims_by_loc[x][z] = town
@@ -312,10 +308,9 @@ class Plugin(BasePlugin):
         # check for chests role
         # print(">> InventoryOpenEvent")
         holder = event.getInventory().getHolder()
-        if hack_func_for_overworld(holder):
+        if hack_func_for_overworld(mage.player):
             return
-
-        if hasattr(holder, "getLocation"):
+        if holder and hasattr(holder, "getLocation"):
             bukkit_chunk = holder.getLocation().getChunk()
             town = self.claims_by_loc[bukkit_chunk.getX()].get(
                 bukkit_chunk.getZ(), self.wilderness
@@ -409,8 +404,7 @@ class Plugin(BasePlugin):
                 if not town.get_rule("pvp"):
                     event.setCancelled(True)
                     raise PlayerErrorMessage(
-                        "PvP is forbidden in {}".format(town.name),
-                        mage.player,
+                        "PvP is forbidden in {}".format(town.name), mage.player,
                     )
             elif isinstance(target, ArmorStand):
                 if not self.check_town_permission(mage, town, "build"):
@@ -429,8 +423,7 @@ class Plugin(BasePlugin):
                 if not self.check_town_permission(mage, town, "pve"):
                     event.setCancelled(True)
                     raise PlayerErrorMessage(
-                        "PvE is forbidden in {}".format(town.name),
-                        mage.player,
+                        "PvE is forbidden in {}".format(town.name), mage.player,
                     )
         elif isinstance(damager, Creeper):
             location = target.getLocation()
@@ -648,8 +641,7 @@ class Plugin(BasePlugin):
         if mage and not self.check_town_permission(mage, town, "pve"):
             event.setCancelled(True)
             raise PlayerErrorMessage(
-                "PvE is forbidden in {}".format(town.name),
-                mage.player,
+                "PvE is forbidden in {}".format(town.name), mage.player,
             )
 
     def can_piston_move(self, event):
