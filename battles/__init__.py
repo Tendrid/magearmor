@@ -98,7 +98,7 @@ class Plugin(BasePlugin):
     @asynchronous()
     def on_inventoy_click(self, event, mage):
         inventory = event.getClickedInventory()
-        if inventory.getType() == InventoryType.PLAYER:
+        if inventory and inventory.getType() == InventoryType.PLAYER:
             entity = inventory.getHolder()
             if (
                 isinstance(entity, Player)
