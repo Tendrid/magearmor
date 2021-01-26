@@ -1,4 +1,4 @@
-from mcapi import asynchronous, synchronous
+from mcapi import asynchronous, synchronous, SERVER
 from core.mageworld import MageWorld
 from core.plugin import BasePlugin, PluginData
 
@@ -117,6 +117,7 @@ class Plugin(BasePlugin):
 
         self.claims_by_loc[x][z] = town
         self.towns.get(town.uuid).save()
+        self.dynmap_update_chunk(int(x), int(z))
 
     def unclaim(self, mage, x, z, world_uuid):
         claimed_by = self.get_town_by_coords(x, z)
@@ -130,6 +131,7 @@ class Plugin(BasePlugin):
 
         del self.claims_by_loc[x][z]
         self.towns.get(town.uuid).save()
+        self.dynmap_update_chunk(int(x), int(z))
 
     def create_town(self, mage):
         player_town = self.get_town_by_player_uuid(mage.uuid)
@@ -152,6 +154,35 @@ class Plugin(BasePlugin):
     #     towns = MageWorld.get_config(self.lib_name, "towns")
     #     self.config = towns_default.update(towns)
 
+    def dynmap_update_chunk(self, chunk_x, chunk_z, reset=False):
+        x = chunk_x * 16
+        z = chunk_z * 16
+        town = self.claims_by_loc.get(chunk_x, {}).get(chunk_z)
+        chunk_id = "chunk_{}_{}".format(chunk_x, chunk_z)
+        if town and not reset:
+            out = []
+            out.append("dmarker addcorner {} 0 {} world".format(x, z))
+            out.append("dmarker addcorner {} 0 {} world".format(x + 16, z))
+            out.append("dmarker addcorner {} 0 {} world".format(x + 16, z + 16))
+            out.append("dmarker addcorner {} 0 {} world".format(x, z + 16))
+            out.append('dmarker addarea id:{} "{}"'.format(chunk_id, town.name))
+            out.append(
+                "dmarker updatearea id:{} fillcolor:21B9DB color:52C2F2 opacity:0.0 fillopacity:0.3".format(
+                    chunk_id
+                )
+            )
+            for cmd in out:
+                SERVER.dispatchCommand(SERVER.getConsoleSender(), cmd)
+        else:
+            SERVER.dispatchCommand(
+                SERVER.getConsoleSender(), "dmarker deletearea id:{}".format(chunk_id)
+            )
+
+    def dynmap_reset_town(self, town):
+        for chunk in town.data["chunks"]:
+            self.dynmap_update_chunk(chunk[0], chunk[1], True)
+            self.dynmap_update_chunk(chunk[0], chunk[1])
+
     def on_load(self):
         self.player_data = IndexStorage(self.lib_name, "players")
         self.towns = IndexStorage(self.lib_name, "towns", Town)
@@ -162,6 +193,8 @@ class Plugin(BasePlugin):
                 self.claims_by_loc[chunk[0]][chunk[1]] = town
         # run towns_fix_cuboids
         # run towns_update_dynmap_all_towns
+        for uuid, town in self.towns:
+            self.dynmap_reset_town(town)
 
     @asynchronous()
     def on_player_move(self, event, mage):
@@ -187,22 +220,16 @@ class Plugin(BasePlugin):
                     ),
                 )
 
-    @asynchronous()
     def on_player_join(self, event, mage):
-        if not mage.data.keys():
-            logging.debug("Player doesnt have a town")
-
-    @asynchronous()
-    def on_player_quit(self, event, mage):
-        # save player data
-        # player_uuid = str(event.getPlayer().getUniqueId())
-        # pd = self.player_data.get(player_uuid)
-        # pd.save()
         town = self.get_town_by_player_uuid(mage.uuid)
         if town:
-            self.towns.get(town.uuid).save()
+            self.dynmap_reset_town(town)
 
-        # save town data
+    def on_player_quit(self, event, mage):
+        town = self.get_town_by_player_uuid(mage.uuid)
+        if town:
+            town.save()
+            self.dynmap_reset_town(town)
 
     def on_player_breaks_block(self, event, mage):
         # print(">> BlockBreakEvent")
