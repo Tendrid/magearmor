@@ -54,10 +54,10 @@ class Town(DataStorage):
                 self.data[k] = v
 
     def add_member(self, mage):
-        if mage.uuid == self.data["owner"]:
-            raise PlayerErrorMessage(
-                "{} is already the owner of {}".format(mage.name, self.name)
-            )
+        # if mage.uuid == self.data["owner"]:
+        #     raise PlayerErrorMessage(
+        #         "{} is already the owner of {}".format(mage.name, self.name)
+        #     )
         if self.data["members"].get(mage.uuid):
             raise PlayerErrorMessage(
                 "{} is already a member of {}".format(mage.name, self.name)
@@ -88,23 +88,25 @@ class Town(DataStorage):
         self.data["ranks"][rank_idx] = new_rank_name
         self.save()
 
-    def set_member_rank(self, mage, rank_name):
+    def member_rank(self, mage, rank_name):
         if self.data["members"].get(mage.uuid) is None:
             raise PlayerErrorMessage(
                 "{} is not a member of {}".format(mage.name, self.name)
             )
-        try:
-            rank_idx = self.data["ranks"].index(rank_name)
-        except ValueError:
-            raise PlayerErrorMessage("Invalid rank name")
+        if rank_name:
+            try:
+                rank_idx = self.data["ranks"].index(rank_name)
+            except ValueError:
+                raise PlayerErrorMessage("Invalid rank name")
 
-        if rank_idx >= TOWN_RANK_OWNER:
-            raise PlayerErrorMessage(
-                "You cannot assign the rank of {}".format(rank_name)
-            )
+            if rank_idx >= TOWN_RANK_OWNER:
+                raise PlayerErrorMessage(
+                    "You cannot assign the rank of {}".format(rank_name)
+                )
 
-        self.data["members"][mage.uuid]["rank"] = rank_idx
-        self.save()
+            self.data["members"][mage.uuid]["rank"] = rank_idx
+            self.save()
+        return self.ranks[self.data["members"][mage.uuid]["rank"]]
 
     def set_owner(self, mage):
         old_owner = MageWorld.get_mage(self.data["owner"])
@@ -112,7 +114,7 @@ class Town(DataStorage):
         self.data["owner"] = mage.uuid
         if old_owner:
             self.add_member(old_owner)
-            # self.set_member_rank(old_owner, self.ranks[TOWN_RANK_OWNER - 1])
+            # self.member_rank(old_owner, self.ranks[TOWN_RANK_OWNER - 1])
 
         if self.data["members"].get(mage.uuid):
             self.remove_member(mage)

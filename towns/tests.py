@@ -193,11 +193,11 @@ class TestTownFiles(unittest.TestCase):
         self.assertEquals(len(TestTownFiles.town.data["members"].keys()), 1)
         self.assertEquals(TestTownFiles.town.get_player_rank(mage.uuid), 1)
 
-        TestTownFiles.town.set_member_rank(mage, TestTownFiles.town.ranks[3])
+        TestTownFiles.town.member_rank(mage, TestTownFiles.town.ranks[3])
         self.assertEquals(TestTownFiles.town.get_player_rank(mage.uuid), 3)
 
         with self.assertRaises(PlayerErrorMessage) as rank_exception:
-            TestTownFiles.town.set_member_rank(mage, TestTownFiles.town.ranks[4])
+            TestTownFiles.town.member_rank(mage, TestTownFiles.town.ranks[4])
         self.assertEquals(
             rank_exception.exception.message,
             "You cannot assign the rank of {}".format(TestTownFiles.town.ranks[4]),

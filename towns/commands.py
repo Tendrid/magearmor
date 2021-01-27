@@ -90,7 +90,7 @@ def command_ranks(mage, command):
         raise PlayerErrorMessage("use /towns-rank <rank_name> <new_rank_name>")
 
 
-@register_command(Plugin.lib_name, "add-member")
+@register_command(Plugin.lib_name, "member-add")
 def command_add_member(mage, command):
     only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
@@ -98,7 +98,7 @@ def command_add_member(mage, command):
         raise PlayerErrorMessage("You do not own a town")
 
     if len(command) != 1:
-        raise PlayerErrorMessage("use /towns-add-member <playername>")
+        raise PlayerErrorMessage("use /towns-member-add <playername>")
     else:
         new_member = MageWorld.get_mage_by_name(command[0])
         if not new_member:
@@ -108,7 +108,7 @@ def command_add_member(mage, command):
             mage.player.sendMessage("{} added to {}".format(command[0], town.name))
 
 
-@register_command(Plugin.lib_name, "remove-member")
+@register_command(Plugin.lib_name, "member-remove")
 def command_remove_member(mage, command):
     only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
@@ -116,7 +116,7 @@ def command_remove_member(mage, command):
         raise PlayerErrorMessage("You do not own a town")
 
     if len(command) != 1:
-        raise PlayerErrorMessage("use /towns-remove-member <playername>")
+        raise PlayerErrorMessage("use /towns-member-remove <playername>")
     else:
         new_member = MageWorld.get_mage_by_name(command[0])
         if not new_member:
@@ -124,3 +124,27 @@ def command_remove_member(mage, command):
         else:
             town.remove_member(new_member)
             mage.player.sendMessage("{} removed from {}".format(command[0], town.name))
+
+
+@register_command(Plugin.lib_name, "member-rank")
+def member_rank(mage, command):
+    only_kingdoms()
+    town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
+    if not town:
+        raise PlayerErrorMessage("You do not own a town")
+
+    cmd_len = len(command)
+    if cmd_len in [1, 2]:
+        member = MageWorld.get_mage_by_name(command[0])
+        if not member:
+            raise PlayerErrorMessage("Unknown Player {}".format(command[0]))
+
+        rank = command[1] if cmd_len == 2 else None
+        new_rank = town.member_rank(member, rank)
+        mage.player.sendMessage("{} rank: {}".format(member.name, new_rank))
+    else:
+        raise PlayerErrorMessage(
+            "use /towns-member-rank <playername> <{}>".format(
+                ", ".join(town.ranks[1:4])
+            )
+        )
