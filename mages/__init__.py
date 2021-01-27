@@ -7,6 +7,9 @@ from dimension import Dimension
 from core.mageworld import MageWorld
 
 from com.denizenscript.depenizen.bukkit.bungee import BungeeBridge
+from time import sleep
+
+import logging
 
 
 class Plugin(BasePlugin):
@@ -21,16 +24,24 @@ class Plugin(BasePlugin):
         #    self.mages.get_or_create(player)
 
     @asynchronous()
+    def on_server_load(self, event, mage):
+        self.refresh_servers()
+
+    @asynchronous()
     def on_player_join(self, event, mage):
         self.refresh_servers()
         mage.login(event.getPlayer())
 
     def refresh_servers(self):
-        if BungeeBridge.instance:
-            for server_name in BungeeBridge.instance.knownServers:
-                self.servers.get_or_create(str(server_name))
-            MageWorld.dimension = self.servers.get(BungeeBridge.instance.serverName)
+        while BungeeBridge.instance is None:
+            logging.info("Bungee: waiting for bungee")
+            sleep(1)
+        for server_name in BungeeBridge.instance.knownServers:
+            self.servers.get_or_create(str(server_name))
+        MageWorld.dimension = self.servers.get(BungeeBridge.instance.serverName)
+        return MageWorld.dimension
 
     @asynchronous()
     def on_player_quit(self, event, mage):
+        self.refresh_servers()
         mage.logoff()

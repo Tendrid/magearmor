@@ -106,3 +106,21 @@ def command_add_member(mage, command):
         else:
             town.add_member(new_member)
             mage.player.sendMessage("{} added to {}".format(command[0], town.name))
+
+
+@register_command(Plugin.lib_name, "remove-member")
+def command_remove_member(mage, command):
+    only_kingdoms()
+    town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
+    if not town:
+        raise PlayerErrorMessage("You do not own a town")
+
+    if len(command) != 1:
+        raise PlayerErrorMessage("use /towns-remove-member <playername>")
+    else:
+        new_member = MageWorld.get_mage_by_name(command[0])
+        if not new_member:
+            raise PlayerErrorMessage("Unknown Player {}".format(command[0]))
+        else:
+            town.remove_member(new_member)
+            mage.player.sendMessage("{} removed from {}".format(command[0], town.name))

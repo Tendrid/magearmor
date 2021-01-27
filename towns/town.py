@@ -54,6 +54,10 @@ class Town(DataStorage):
                 self.data[k] = v
 
     def add_member(self, mage):
+        if mage.uuid == self.data["owner"]:
+            raise PlayerErrorMessage(
+                "{} is already the owner of {}".format(mage.name, self.name)
+            )
         if self.data["members"].get(mage.uuid):
             raise PlayerErrorMessage(
                 "{} is already a member of {}".format(mage.name, self.name)

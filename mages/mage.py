@@ -26,13 +26,17 @@ class Mage(DataStorage):
 
     def login(self, player=None):
         self.__player = player or SERVER.getPlayer(self.uuid)
-        self.load()
-        self.data["dimension"] = MageWorld.dimension.uuid
-        self.load_inventory()
+        if self.__player:
+            self.load()
+            self.data["name"] = player.getName()
+            if MageWorld.dimension:
+                self.data["dimension"] = MageWorld.dimension.uuid
+            self.load_inventory()
 
     def logoff(self):
-        if self.data["dimension"] == MageWorld.dimension.uuid:
-            self.save_inventory()
+        if self.__player:
+            if self.data["dimension"] == MageWorld.dimension.uuid:
+                self.save_inventory()
         self.__player = SERVER.getOfflinePlayer(UUID.fromString(self.uuid))
 
     @property
