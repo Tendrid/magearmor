@@ -11,7 +11,6 @@ if not os.path.isdir(path):
 ### Import Core World ###########################
 from core.mageworld import MageWorld
 
-
 ### Import Plugins ##############################
 import mages
 import towns

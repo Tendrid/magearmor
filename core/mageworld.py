@@ -4,8 +4,9 @@ import logging
 import json
 import copy
 
-from core.exceptions import PlayerErrorMessage
+from worlds import Worlds
 
+from core.exceptions import PlayerErrorMessage
 from org.bukkit.event.player import PlayerJoinEvent
 from org.bukkit.event.server import ServerCommandEvent
 from org.bukkit.event import EventPriority

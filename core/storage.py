@@ -95,6 +95,11 @@ class IndexStorage(object):
             self.files[key].save()
         return self.files[key]
 
+    def save_all(self):
+        for file, storage in self.files.iteritems():
+            logging.info(file)
+            storage.save()
+
     def __iter__(self):
         for k, v in self.files.iteritems():
             yield k, v
