@@ -151,3 +151,6 @@ class Town(DataStorage):
         for idx in flagged:
             self.data["chunks"].pop(idx)
         self.save()
+
+    def __repr__(self):
+        return "{} {}".format(self.__class__, self.name)

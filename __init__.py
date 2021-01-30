@@ -29,6 +29,8 @@ MageWorld.load_plugin(battles.Plugin)
 from towns import commands
 from mages import commands
 
+### Import Admin ################################
+from core import admin
 
 ### Run Tests ###################################
 if os.environ.get("RUN_TESTS"):

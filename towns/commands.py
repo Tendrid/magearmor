@@ -1,6 +1,6 @@
 from mcapi import add_command
 from core.mageworld import MageWorld
-from core.commands import register_command
+from core.commands import player_command, console_command
 from . import Plugin
 from core.exceptions import PlayerErrorMessage
 
@@ -10,7 +10,7 @@ def only_kingdoms():
         raise PlayerErrorMessage("Towns only available in kingdoms right now")
 
 
-@register_command(Plugin.lib_name, "claim")
+@player_command(Plugin.lib_name, "claim")
 def command_claim(mage, command):
     only_kingdoms()
     bukkit_chunk = mage.location.getChunk()
@@ -24,7 +24,7 @@ def command_claim(mage, command):
     mage.player.sendMessage("Plot claimed")
 
 
-@register_command(Plugin.lib_name, "unclaim")
+@player_command(Plugin.lib_name, "unclaim")
 def command_unclaim(mage, command):
     only_kingdoms()
     bukkit_chunk = mage.location.getChunk()
@@ -38,14 +38,14 @@ def command_unclaim(mage, command):
     mage.player.sendMessage("Plot unclaimed")
 
 
-@register_command(Plugin.lib_name, "create")
+@player_command(Plugin.lib_name, "create")
 def command_create(mage, command):
     only_kingdoms()
     MageWorld.plugins["towns"].create_town(mage)
     mage.player.sendMessage("Village created!")
 
 
-@register_command(Plugin.lib_name, "name")
+@player_command(Plugin.lib_name, "name")
 def command_name(mage, command):
     only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
@@ -56,7 +56,7 @@ def command_name(mage, command):
     mage.player.sendMessage("{} renamed to {}".format(old_name, town.name))
 
 
-@register_command(Plugin.lib_name, "permissions")
+@player_command(Plugin.lib_name, "permissions")
 def command_permissions(mage, command):
     only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
@@ -73,7 +73,7 @@ def command_permissions(mage, command):
         raise PlayerErrorMessage("use /towns-permissions <permission_name> <rank_name>")
 
 
-@register_command(Plugin.lib_name, "ranks")
+@player_command(Plugin.lib_name, "ranks")
 def command_ranks(mage, command):
     only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
@@ -90,7 +90,7 @@ def command_ranks(mage, command):
         raise PlayerErrorMessage("use /towns-rank <rank_name> <new_rank_name>")
 
 
-@register_command(Plugin.lib_name, "member-add")
+@player_command(Plugin.lib_name, "member-add")
 def command_add_member(mage, command):
     only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
@@ -108,7 +108,7 @@ def command_add_member(mage, command):
             mage.player.sendMessage("{} added to {}".format(command[0], town.name))
 
 
-@register_command(Plugin.lib_name, "member-remove")
+@player_command(Plugin.lib_name, "member-remove")
 def command_remove_member(mage, command):
     only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)
@@ -126,7 +126,7 @@ def command_remove_member(mage, command):
             mage.player.sendMessage("{} removed from {}".format(command[0], town.name))
 
 
-@register_command(Plugin.lib_name, "member-rank")
+@player_command(Plugin.lib_name, "member-rank")
 def member_rank(mage, command):
     only_kingdoms()
     town = MageWorld.plugins["towns"].get_town_by_player_uuid(mage.uuid)

@@ -108,3 +108,6 @@ class Mage(DataStorage):
         # send command to bungee
         cmd = ExecuteCommandPacketOut("send {} {}".format(self.name, dimension_name))
         BungeeBridge.instance.sendPacket(cmd)
+
+    def __repr__(self):
+        return "{} {}".format(self.__class__, self.name)
