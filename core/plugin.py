@@ -17,19 +17,20 @@ from org.bukkit.event.block import BlockBreakEvent, BlockCanBuildEvent
 
 from org.bukkit.event.hanging import HangingBreakEvent
 from org.bukkit.event.hanging import HangingPlaceEvent
-from org.bukkit.event.player import PlayerArmorStandManipulateEvent
 from org.bukkit.event.inventory import InventoryOpenEvent
 from org.bukkit.event.vehicle import VehicleDestroyEvent
-from org.bukkit.event.player import PlayerBucketEmptyEvent, PlayerBucketFillEvent
 from org.bukkit.event.entity import CreatureSpawnEvent, PlayerLeashEntityEvent
 from org.bukkit.event.block import BlockFromToEvent
 from org.bukkit.event.player import (
     PlayerInteractEvent,
     PlayerTeleportEvent,
     PlayerInteractEntityEvent,
+    AsyncPlayerChatEvent,
+    PlayerBucketEmptyEvent,
+    PlayerBucketFillEvent,
+    PlayerArmorStandManipulateEvent,
 )
 from org.bukkit.event.entity import EntityExplodeEvent, EntityChangeBlockEvent
-
 from org.bukkit.event.block import BlockPistonExtendEvent, BlockPistonRetractEvent
 
 CALLBACKS_METHODS = {
@@ -59,6 +60,7 @@ CALLBACKS_METHODS = {
     "on_player_leash_entity": PlayerLeashEntityEvent,
     "on_piston_extend": BlockPistonExtendEvent,
     "on_piston_retract": BlockPistonRetractEvent,
+    "on_player_chat": AsyncPlayerChatEvent,
 }
 
 

@@ -45,3 +45,17 @@ class Plugin(BasePlugin):
     def on_player_quit(self, event, mage):
         self.refresh_servers()
         mage.logoff()
+
+    @synchronous()
+    def on_player_chat(self, event, mage):
+        dimension_names = [
+            uuid
+            for uuid, server in MageWorld.plugins["mages"].servers
+            if server != MageWorld.dimension
+        ]
+        for dimension in dimension_names:
+            announce_cmd = 'ex bungee {} {{ - announce "<&lt>{}<&gt> {}" }}'.format(
+                dimension, mage.name, event.message
+            )
+
+            SERVER.dispatchCommand(SERVER.getConsoleSender(), announce_cmd)
