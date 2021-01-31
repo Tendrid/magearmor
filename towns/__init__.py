@@ -352,10 +352,10 @@ class Plugin(BasePlugin):
         # check for build role
         # print(">> VehicleDestroyEvent")
         player = event.getAttacker()
-        if hack_func_for_overworld(player):
+        cart_entity = event.getVehicle()
+        if hack_func_for_overworld(cart_entity):
             return
         if isinstance(player, Player):
-            cart_entity = event.getVehicle()
             mage = MageWorld.get_mage(str(player.getUniqueId()))
             bukkit_chunk = cart_entity.getLocation().getChunk()
             town = self.claims_by_loc[bukkit_chunk.getX()].get(

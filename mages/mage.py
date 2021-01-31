@@ -2,7 +2,7 @@ from core.mageworld import MageWorld
 from core.exceptions import PlayerErrorMessage
 from core.storage import DataStorage
 from mcapi import SERVER
-
+import logging
 from java.util import UUID
 
 
@@ -35,7 +35,13 @@ class Mage(DataStorage):
 
     def logoff(self):
         if self.__player:
-            if self.data["dimension"] == MageWorld.dimension.uuid:
+            if self.data.get("dimension") is None:
+                logging.warn(
+                    "mage.dimension was None on {}!  This should never happen!".format(
+                        mage
+                    )
+                )
+            if self.data.get("dimension") == MageWorld.dimension.uuid:
                 self.save_inventory()
         self.__player = SERVER.getOfflinePlayer(UUID.fromString(self.uuid))
 

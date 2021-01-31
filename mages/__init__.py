@@ -12,6 +12,9 @@ from time import sleep
 import logging
 
 
+from org.bukkit.event.inventory import InventoryType
+
+
 class Plugin(BasePlugin):
     lib_name = "mages"
     config_files = ("default_mage", "config")
@@ -31,6 +34,7 @@ class Plugin(BasePlugin):
     def on_player_join(self, event, mage):
         self.refresh_servers()
         mage.login(event.getPlayer())
+        event.setJoinMessage(None)
 
     def refresh_servers(self):
         while BungeeBridge.instance is None:
@@ -45,6 +49,7 @@ class Plugin(BasePlugin):
     def on_player_quit(self, event, mage):
         self.refresh_servers()
         mage.logoff()
+        event.setQuitMessage(None)
 
     @synchronous()
     def on_player_chat(self, event, mage):
@@ -59,3 +64,16 @@ class Plugin(BasePlugin):
             )
 
             SERVER.dispatchCommand(SERVER.getConsoleSender(), announce_cmd)
+
+    def on_inventoy_click(self, event, mage):
+        inventory = event.getClickedInventory()
+        if inventory.getType() is InventoryType.PLAYER:
+            in_hand = event.getCursor()
+            in_slot = event.getCurrentItem()
+            if in_hand != in_slot:
+                player = event.getInventory().getHolder()
+                mage = self.mages.get(str(player.getUniqueId()))
+                logging.debug(
+                    "{} replaced {} with {}".format(mage.name, in_slot, in_hand)
+                )
+                mage.save()
