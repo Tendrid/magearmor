@@ -67,7 +67,7 @@ class Plugin(BasePlugin):
 
     def on_inventoy_click(self, event, mage):
         inventory = event.getClickedInventory()
-        if inventory.getType() is InventoryType.PLAYER:
+        if inventory and inventory.getType() is InventoryType.PLAYER:
             in_hand = event.getCursor()
             in_slot = event.getCurrentItem()
             if in_hand != in_slot:
