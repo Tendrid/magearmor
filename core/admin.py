@@ -1,6 +1,6 @@
 from core.storage import IndexStorage
 from core.commands import console_command
-import logging
+from core.logs import console_log
 import json
 
 
@@ -19,7 +19,7 @@ def deep_get(names, obj):
 @console_command("save-all")
 def save_all(parameters):
     for name, storage in IndexStorage.codex.iteritems():
-        logging.info("saving {}".format(name))
+        console_log.info("saving {}".format(name))
         storage.save_all()
 
 
@@ -28,25 +28,25 @@ def list_plugin(parameters):
     cmd_len = len(parameters)
 
     if cmd_len == 0:
-        print(IndexStorage.codex.keys())
+        console_log.info(IndexStorage.codex.keys())
     elif cmd_len == 1:
         store = IndexStorage.codex.get(parameters[0])
-        print(store)
+        console_log.info(store)
         if store:
             for name, storage in store:
-                print(name, storage)
+                console_log.info(name, storage)
     elif cmd_len == 2:
         store = IndexStorage.codex.get(parameters[0])
         if store:
             item = store.get(parameters[1])
             if item:
-                print(item.data)
+                console_log.info(item.data)
     elif cmd_len == 3:
         store = IndexStorage.codex.get(parameters[0])
         if store:
             item = store.get(parameters[1])
             if item:
-                print(deep_get(parameters[2].split("."), item.data))
+                console_log.info(deep_get(parameters[2].split("."), item.data))
 
 
 def prep_command(parameters):
@@ -68,17 +68,23 @@ def prep_command(parameters):
 
     value_key = namespace.pop()
     obj = deep_get(namespace, item.data)
-    logging.warn("ALTERING STORE DATA FOR {}: {}".format(store_name, uuid))
-    logging.warn("PREVIOUS STATE -----------------------------------------------------")
+    console_log.warn("ALTERING STORE DATA FOR {}: {}".format(store_name, uuid))
+    console_log.warn(
+        "PREVIOUS STATE -----------------------------------------------------"
+    )
     print(obj)
-    logging.warn("--------------------------------------------------------------------")
+    console_log.warn(
+        "--------------------------------------------------------------------"
+    )
     return obj, value_key, newvalue
 
 
 @console_command("edit")
 def edit_plugin(parameters):
     if len(parameters) != 4:
-        print("/mageadmin-edit <store_name> <uuid> <namespace_str> <newvalue>")
+        console_log.info(
+            "/mageadmin-edit <store_name> <uuid> <namespace_str> <newvalue>"
+        )
         return
     try:
         obj, value_key, newvalue = prep_command(parameters)
@@ -91,7 +97,7 @@ def edit_plugin(parameters):
 @console_command("add")
 def add_plugin(parameters):
     if len(parameters) != 4:
-        print("/mageadmin-add <store> <uuid> <namespace> <addvalue>")
+        console_log.info("/mageadmin-add <store> <uuid> <namespace> <addvalue>")
         return
     try:
         obj, value_key, newvalue = prep_command(parameters)

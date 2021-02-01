@@ -6,7 +6,6 @@ from town import Town, TOWN_CLAIM_TYPE_NORMAL
 
 from core.storage import IndexStorage
 
-import logging
 from collections import defaultdict
 from core.exceptions import PlayerErrorMessage
 

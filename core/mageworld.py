@@ -1,6 +1,6 @@
 from functools import wraps
 from mcapi import *
-import logging
+from core.logs import console_log
 import json
 import copy
 
@@ -30,7 +30,7 @@ class EventListener(Listener):
             elif e.player and hasattr(e.player, "sendMessage"):
                 e.player.sendMessage(e.message)
             else:
-                logging.error(e.message)
+                console_log.error(e.message)
 
 
 class WorldInstance(object):
@@ -40,11 +40,12 @@ class WorldInstance(object):
     config = {}
     plugins = {}
     listeners = []
-    logger = logging.getLogger("magearmor")
+    logger = console_log
 
     def __init__(self, *args, **kwargs):
+        pass
         # self.logger.setLevel(logging.INFO)
-        logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
+        # logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
 
         # for player in SERVER.getOnlinePlayers():
         #     if self.players.get(str(player.getUniqueId())) is None:
@@ -83,7 +84,7 @@ class WorldInstance(object):
     """
 
     def register_config(self, lib_name, config_name):
-        logging.info("Registering config: {} {}".format(lib_name, config_name))
+        console_log.info("Registering config: {} {}".format(lib_name, config_name))
         path = os.path.abspath(
             os.path.join("python-plugins", lib_name, "config", config_name)
         )

@@ -6,7 +6,6 @@ from core.exceptions import PlayerErrorMessage
 from org.bukkit import Bukkit
 from org.bukkit.command import Command
 from org.bukkit.command import ConsoleCommandSender
-import logging
 
 SERVER = Bukkit.getServer()
 

@@ -9,10 +9,10 @@ from core.mageworld import MageWorld
 from com.denizenscript.depenizen.bukkit.bungee import BungeeBridge
 from time import sleep
 
-import logging
-
+from core.logs import debug_log, console_log
 
 from org.bukkit.event.inventory import InventoryType
+from org.bukkit.entity import Player
 
 
 class Plugin(BasePlugin):
@@ -38,7 +38,7 @@ class Plugin(BasePlugin):
 
     def refresh_servers(self):
         while BungeeBridge.instance is None:
-            logging.info("Bungee: waiting for bungee")
+            console_log.info("Bungee: waiting for bungee")
             sleep(1)
         for server_name in BungeeBridge.instance.knownServers:
             self.servers.get_or_create(str(server_name))
@@ -72,8 +72,9 @@ class Plugin(BasePlugin):
             in_slot = event.getCurrentItem()
             if in_hand != in_slot:
                 player = event.getInventory().getHolder()
-                mage = self.mages.get(str(player.getUniqueId()))
-                logging.debug(
-                    "{} replaced {} with {}".format(mage.name, in_slot, in_hand)
-                )
-                mage.save()
+                if isinstance(player, Player):
+                    mage = self.mages.get(str(player.getUniqueId()))
+                    debug_log.debug(
+                        "{} replaced {} with {}".format(mage.name, in_slot, in_hand)
+                    )
+                    mage.save()

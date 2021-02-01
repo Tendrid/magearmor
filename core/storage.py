@@ -1,6 +1,6 @@
 import json
 import os
-import logging
+from core.logs import debug_log, console_log
 
 BASE_DIR = ("python-plugins", "storage")
 
@@ -28,6 +28,8 @@ class DataStorage(object):
             self.set_data(json.load(fh))
 
     def save(self):
+        debug_log.debug("saving {}".format(str(self.uuid)))
+        debug_log.debug(self.data)
         with open(self.path, "w+") as fh:
             json.dump(self.data, fh)
 
@@ -97,7 +99,7 @@ class IndexStorage(object):
 
     def save_all(self):
         for file, storage in self.files.iteritems():
-            logging.info(file)
+            console_log.info(file)
             storage.save()
 
     def __iter__(self):
