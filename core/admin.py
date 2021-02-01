@@ -28,25 +28,25 @@ def list_plugin(parameters):
     cmd_len = len(parameters)
 
     if cmd_len == 0:
-        console_log.info(IndexStorage.codex.keys())
+        print(IndexStorage.codex.keys())
     elif cmd_len == 1:
         store = IndexStorage.codex.get(parameters[0])
-        console_log.info(store)
+        print(store)
         if store:
             for name, storage in store:
-                console_log.info(name, storage)
+                print(name, storage)
     elif cmd_len == 2:
         store = IndexStorage.codex.get(parameters[0])
         if store:
             item = store.get(parameters[1])
             if item:
-                console_log.info(item.data)
+                print(item.data)
     elif cmd_len == 3:
         store = IndexStorage.codex.get(parameters[0])
         if store:
             item = store.get(parameters[1])
             if item:
-                console_log.info(deep_get(parameters[2].split("."), item.data))
+                print(deep_get(parameters[2].split("."), item.data))
 
 
 def prep_command(parameters):
