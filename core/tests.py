@@ -36,7 +36,8 @@ class TestDataStorage(unittest.TestCase):
     def test_create_file(self):
         path = os.path.abspath(os.path.join(*(BASE_DIR + ("ds_test",))))
         os.makedirs(path)
-        store = DataStorage("test", "{}/test.json".format(path), {"a": "b"})
+        store = DataStorage("test", "{}/test.json".format(path))
+        store.set_data({"a": "b"})
         store.save()
 
         self.assertEquals(store.data["a"], "b")
@@ -69,7 +70,8 @@ class TestIndexStorage(unittest.TestCase):
             "bool": True,
         }
 
-        store.add("file1", test_obj)
+        store.add("file1")
+        store.set_data(test_objst)
 
         self.assertTrue(os.path.isfile("{}/file1.json".format(path)))
 

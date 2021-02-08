@@ -38,7 +38,14 @@ from org.bukkit.event.entity.CreatureSpawnEvent import SpawnReason
 
 
 def hack_func_for_overworld(thing):
-    return thing.getWorld().getName() in ["world_nether", "world_the_end"]
+    if MageWorld.dimension is not None:
+        is_kingdoms = MageWorld.dimension.uuid != "kingdoms"
+    else:
+        is_kingdoms = True
+
+    return (
+        thing.getWorld().getName() in ["world_nether", "world_the_end"] or is_kingdoms
+    )
 
 
 class Wilderness(Town):
@@ -197,6 +204,8 @@ class Plugin(BasePlugin):
 
     @asynchronous()
     def on_player_move(self, event, mage):
+        if hack_func_for_overworld(mage.player):
+            return
         if event.getFrom().getChunk() != event.getTo().getChunk():
             to_chunk = event.getTo().getChunk()
             to_town = self.claims_by_loc[to_chunk.getX()].get(to_chunk.getZ())

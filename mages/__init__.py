@@ -14,6 +14,8 @@ from core.logs import debug_log, console_log
 from org.bukkit.event.inventory import InventoryType
 from org.bukkit.entity import Player
 
+# from core.hivemind import HiveChat
+
 
 class Plugin(BasePlugin):
     lib_name = "mages"
@@ -53,6 +55,7 @@ class Plugin(BasePlugin):
 
     @synchronous()
     def on_player_chat(self, event, mage):
+        # HiveChat(player_name=mage.name, message=event.message).send()
         dimension_names = [
             uuid
             for uuid, server in MageWorld.plugins["mages"].servers

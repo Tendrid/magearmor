@@ -1,18 +1,21 @@
 import json
 import os
 from core.logs import debug_log, console_log
+import logging
+
+# from core.hivemind import HiveStore
 
 BASE_DIR = ("python-plugins", "storage")
 
 
 class DataStorage(object):
-    def __init__(self, uuid, path, data=None):
+    def __init__(self, uuid, path, plugin_name=None, storage_name=None):
         self.uuid = uuid
         self.path = path
-        if data:
-            self.set_data(data)
-        else:
-            self.load()
+        self.plugin_name = plugin_name
+        self.storage_name = storage_name
+        self.data = {}
+        self.load()
 
     def set_data(self, data):
         self.data = data
@@ -30,6 +33,9 @@ class DataStorage(object):
     def save(self):
         debug_log.debug("saving {}".format(str(self.uuid)))
         debug_log.debug(self.data)
+        # HiveStore(
+        #     data=self.data, plugin_name=self.plugin_name, storage_name=self.storage_name
+        # ).send()
         with open(self.path, "w+") as fh:
             json.dump(self.data, fh)
 
@@ -41,6 +47,8 @@ class IndexStorage(object):
         # TODO: Way for storage objects to maitain their storage locations
         #       but also patch existing objects, such as "mage", so plugins can add
         #       data to those objects
+        self.plugin_name = plugin_name
+        self.storage_name = storage_name
         self.codex[storage_name] = self
         self.storage_module = storage_module
         self.path = os.path.abspath(
@@ -56,7 +64,7 @@ class IndexStorage(object):
             file_path = os.path.join(self.path, file_name)
             if file_name.endswith(".json") and os.path.isfile(file_path):
                 self.files[file_name[0:-5]] = self.storage_module(
-                    file_name[0:-5], file_path
+                    file_name[0:-5], file_path, self.plugin_name, self.storage_name
                 )
 
     def get(self, key):
