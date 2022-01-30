@@ -15,12 +15,14 @@ from core.mageworld import MageWorld
 import mages
 import towns
 import battles
+import mobscale
 
 # import spells
 
 MageWorld.load_plugin(mages.Plugin)
 MageWorld.load_plugin(towns.Plugin)
 MageWorld.load_plugin(battles.Plugin)
+MageWorld.load_plugin(mobscale.Plugin)
 # MageWorld.load_plugin(spells.Plugin)
 
 

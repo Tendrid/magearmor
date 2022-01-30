@@ -1,6 +1,6 @@
 import unittest
-import os
 
+from core.logs import debug_log
 from core.mageworld import MageWorld
 from . import Plugin
 from town import Town, TOWN_RANK_OWNER
@@ -29,15 +29,13 @@ class TestTownFiles(unittest.TestCase):
 
         self.assertEquals(plugin.config_files, ("default_town", "wilderness", "config"))
 
+    """
     def test_town_set_data(self):
         plugin = MageWorld.plugins[Plugin.lib_name]
-        path = os.path.abspath(os.path.join(*(BASE_DIR + ("towns", "towns"))))
 
         # test saved town file with limited deep data (like permissions)
         # make sure they get updated from default
-        town = Town(
-            "towns", "{}/00000000-0000-0000-0000-000000000001.json".format(path), {},
-        )
+        town = Town("00000000-0000-0000-0000-000000000001", "towns", "towns")
         town.data["permissions"] = {"unknown": "permission", "build": 99}
         town.save()
         self.assertEquals(len(town.data["permissions"].keys()), 2)
@@ -54,8 +52,9 @@ class TestTownFiles(unittest.TestCase):
         self.assertEquals(mage_town.data["permissions"]["unknown"], "permission")
         self.assertEquals(mage_town.data["permissions"]["build"], 99)
 
-        os.remove(mage_town.path)
-
+        #os.remove(mage_town.path)
+        """
+        
     def test_b1_town_create(self):
         mage = MageWorld.mage_join(PLAYER_NOTCH)
 
@@ -63,6 +62,16 @@ class TestTownFiles(unittest.TestCase):
 
         # make sure player does not own a town
         self.assertEquals(plugin.get_town_by_player_uuid(mage.uuid), None)
+
+        debug_log.debug("==============================")
+        debug_log.debug("==============================")
+        debug_log.debug("==============================")
+        debug_log.debug("==============================")
+        debug_log.debug(mage)
+        debug_log.debug("==============================")
+        debug_log.debug("==============================")
+        debug_log.debug("==============================")
+        debug_log.debug("==============================")
 
         # create a new town
         TestTownFiles.town = plugin.create_town(mage)
@@ -208,9 +217,10 @@ class TestTownFiles(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        pass
         # clean up test town
-        if TestTownFiles.town:
-            os.remove(TestTownFiles.town.path.replace(".json", ".removed"))
+        #if TestTownFiles.town:
+        #    os.remove(TestTownFiles.town.path.replace(".json", ".removed"))
 
 
 class TestWilderness(unittest.TestCase):

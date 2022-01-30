@@ -1,10 +1,10 @@
 import unittest
-from mcapi import SERVER
-from core.mageworld import MageWorld
+from core.mageworld import MageWorld, SERVER
 from . import Plugin
 from mage import Mage
 from core.plugin import BasePlugin
 from core.storage import IndexStorage
+from core.logs import debug_log
 
 
 class TestMageFiles(unittest.TestCase):
@@ -23,13 +23,13 @@ class TestMageFiles(unittest.TestCase):
 
     def test_mage(self):
         plugin = MageWorld.plugins[Plugin.lib_name]
+        debug_log.debug(SERVER.getOfflinePlayers())
 
         tendrid_id = "0d909fe4-ddcf-4127-ba42-5e539a20ac2c"
         test_players = {}
         for player in SERVER.getOfflinePlayers():
             test_players[str(player.getUniqueId())] = player
-        test_player = test_players[tendrid_id]
-
+        test_player = test_players.get(tendrid_id)
         self.assertEquals(str(test_player.getUniqueId()), tendrid_id)
 
         MageWorld.mage_join(tendrid_id)

@@ -1,6 +1,6 @@
 from core.mageworld import MageWorld
 from core.exceptions import PlayerErrorMessage
-from core.storage import DataStorage
+from core.storage import HiveStorage
 
 import copy
 
@@ -15,7 +15,7 @@ MAX_TOWN_NAME_LENGTH = 32
 MAX_RANK_NAME_LENGTH = 32
 
 
-class Town(DataStorage):
+class Town(HiveStorage):
     @property
     def name(self):
         return self.data.get("name", "Abandoned Ruins")

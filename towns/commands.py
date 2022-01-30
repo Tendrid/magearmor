@@ -6,7 +6,7 @@ from core.exceptions import PlayerErrorMessage
 
 
 def only_kingdoms():
-    if MageWorld.dimension.uuid != "kingdoms":
+    if MageWorld.dimension != "kingdoms":
         raise PlayerErrorMessage("Towns only available in kingdoms right now")
 
 

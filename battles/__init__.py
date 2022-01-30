@@ -1,13 +1,15 @@
+from core.commands import console_command
 from mcapi import asynchronous, synchronous
 from core.plugin import BasePlugin, PluginData
 from mcapi import SERVER
 from core.storage import IndexStorage
 from core.mageworld import MageWorld
+from core.logs import debug_log, console_log
 from hero import Hero
 from modifier import ArmorModifier, DamageModifier
 
 
-from org.bukkit.entity import EntityType, Player, LivingEntity, AbstractArrow
+from org.bukkit.entity import EntityType, Player, LivingEntity
 from org.bukkit import Material
 from org.bukkit.event.inventory import InventoryType
 from org.bukkit.entity.EntityType import PLAYER
@@ -122,24 +124,36 @@ class Plugin(BasePlugin):
     def on_entity_damaged_by_entity(self, event, mage):
         if hasattr(event, "damager"):
             if event.getEntityType() == PLAYER:
+                console_log.info("Player Hit!")
                 hero = self.heros.get_or_create(str(event.entity.getUniqueId()))
                 armor_set = hero.armor_set
             else:
+                console_log.info("Mob Hit! {}".format(event.entity.getType()))
                 armor_set = self.entities.get(
                     event.entity.getType(), self.default_armor
                 )
+                console_log.info("Defender has armor set: ")
+                console_log.info(armor_set.modifiers)
 
             if isinstance(event.damager, LivingEntity) and hasattr(
                 event.damager, "getItemInHand"
             ):
+                console_log.info("Attacker has weapon:")
                 weapon = self.weapons.get(
                     event.damager.getItemInHand().getType(), self.default_weapon
                 )
+            elif hasattr(event.damager, "getShooter"):
+                console_log.info("Attack shot an arrow:")
+                console_log.info(event.damager.getShooter())
+                weapon = self.weapons.get(Material.ARROW, self.default_weapon)
             else:
+                console_log.info("Attack was default stats")
                 weapon = self.default_weapon
+            console_log.info(weapon.modifiers)
 
             damage = event.getFinalDamage()
 
             final_damage = self.calculate_damage(armor_set, weapon, damage)
+            console_log.info("Final Damage: {}".format(final_damage))
 
             event.setDamage(final_damage)

@@ -1,13 +1,14 @@
 from mcapi import SERVER
 
 import unittest
+from core.logs import debug_log
 from core.mageworld import MageWorld
-from core.storage import DataStorage, IndexStorage, BASE_DIR
+from core.storage import IndexStorage, BASE_DIR, HiveStorage
 import mages
 
+from core.hivemind import Telepath, TelepathicMessage
+
 from org.bukkit import World
-import os
-import shutil
 import json
 import time
 
@@ -31,36 +32,24 @@ class TestMageWorld(unittest.TestCase):
     def test_no_mage(self):
         self.assertEquals(MageWorld.get_mage("invalid-mage-uuid"), None)
 
+class TestHiveStorage(unittest.TestCase):
 
-class TestDataStorage(unittest.TestCase):
+    #hive1 = Telepath("localhost", 9009)
+
     def test_create_file(self):
-        path = os.path.abspath(os.path.join(*(BASE_DIR + ("ds_test",))))
-        os.makedirs(path)
-        store = DataStorage("test", "{}/test.json".format(path))
+        #TelepathicMessage.telepath = self.hive1
+        store = HiveStorage(TEST_LIB, "test_store")
+
+
         store.set_data({"a": "b"})
         store.save()
 
         self.assertEquals(store.data["a"], "b")
 
-        self.assertTrue(os.path.isfile("{}/test.json".format(path)))
-        with open("{}/test.json".format(path)) as fh:
-            j = json.load(fh)
-        self.assertEquals(j.get("a"), "b")
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(os.path.abspath(os.path.join(*(BASE_DIR + ("ds_test",)))))
-
-
 class TestIndexStorage(unittest.TestCase):
-    def test_a_create_dir(self):
-        path = os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB, "test_a"))))
-        store = IndexStorage(TEST_LIB, "test_a")
-        self.assertTrue(os.path.isdir(path))
 
     def test_b_create_file(self):
         store = IndexStorage(TEST_LIB, "test_a")
-        path = os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB, "test_a"))))
 
         test_obj = {
             "number": 12,
@@ -70,14 +59,15 @@ class TestIndexStorage(unittest.TestCase):
             "bool": True,
         }
 
-        store.add("file1")
-        store.set_data(test_objst)
-
-        self.assertTrue(os.path.isfile("{}/file1.json".format(path)))
+        file = store.add("file1")
+        file.set_data(test_obj)
+        file.save()
 
     def test_c_read_check(self):
         store = IndexStorage(TEST_LIB, "test_a")
         test_file = store.get("file1")
+        debug_log.debug(test_file)
+        
         self.assertEquals(test_file.data["number"], 12)
         self.assertEquals(test_file.data["string"], "here is my string")
         self.assertEquals(test_file.data["list"], ["a", "b", "c"])
@@ -92,10 +82,12 @@ class TestIndexStorage(unittest.TestCase):
     def test_d_remove_file(self):
         store = IndexStorage(TEST_LIB, "test_a")
         store.remove("file1")
-        path = os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB, "test_a"))))
-        self.assertFalse(os.path.isfile("{}/file1.json".format(path)))
-        self.assertTrue(os.path.isfile("{}/file1.removed".format(path)))
+        
+        #path = os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB, "test_a"))))
+        #self.assertFalse(os.path.isfile("{}/file1.json".format(path)))
+        #self.assertTrue(os.path.isfile("{}/file1.removed".format(path)))
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB,)))))
+        pass
+        #shutil.rmtree(os.path.abspath(os.path.join(*(BASE_DIR + (TEST_LIB,)))))

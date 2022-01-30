@@ -6,7 +6,7 @@ from mage import Mage
 from dimension import Dimension
 from core.mageworld import MageWorld
 
-from com.denizenscript.depenizen.bukkit.bungee import BungeeBridge
+#from com.denizenscript.depenizen.bukkit.bungee import BungeeBridge
 from time import sleep
 
 from core.logs import debug_log, console_log
@@ -14,7 +14,7 @@ from core.logs import debug_log, console_log
 from org.bukkit.event.inventory import InventoryType
 from org.bukkit.entity import Player
 
-# from core.hivemind import HiveChat
+from core.hivemind import HiveChat
 
 
 class Plugin(BasePlugin):
@@ -28,34 +28,37 @@ class Plugin(BasePlugin):
         # for player in SERVER.getOnlinePlayers():
         #    self.mages.get_or_create(player)
 
-    @asynchronous()
-    def on_server_load(self, event, mage):
-        self.refresh_servers()
+    #@asynchronous()
+    #def on_server_load(self, event, mage):
+    #    self.refresh_servers()
 
     @asynchronous()
     def on_player_join(self, event, mage):
-        self.refresh_servers()
+        #self.refresh_servers()
         mage.login(event.getPlayer())
         event.setJoinMessage(None)
 
+    """
     def refresh_servers(self):
-        while BungeeBridge.instance is None:
-            console_log.info("Bungee: waiting for bungee")
-            sleep(1)
-        for server_name in BungeeBridge.instance.knownServers:
-            self.servers.get_or_create(str(server_name))
-        MageWorld.dimension = self.servers.get(BungeeBridge.instance.serverName)
+        #while BungeeBridge.instance is None:
+        #    console_log.info("Bungee: waiting for bungee")
+        #    sleep(1)
+        #for server_name in BungeeBridge.instance.knownServers:
+        #    self.servers.get_or_create(str(server_name))
+        #MageWorld.dimension = self.servers.get(BungeeBridge.instance.serverName)
         return MageWorld.dimension
+    """
 
     @asynchronous()
     def on_player_quit(self, event, mage):
-        self.refresh_servers()
+        #self.refresh_servers()
         mage.logoff()
         event.setQuitMessage(None)
 
     @synchronous()
     def on_player_chat(self, event, mage):
-        # HiveChat(player_name=mage.name, message=event.message).send()
+        print(mage.name)
+        HiveChat(player_name=mage.name, message=event.message).send()
         dimension_names = [
             uuid
             for uuid, server in MageWorld.plugins["mages"].servers
@@ -80,4 +83,4 @@ class Plugin(BasePlugin):
                     debug_log.debug(
                         "{} replaced {} with {}".format(mage.name, in_slot, in_hand)
                     )
-                    mage.save()
+                    #mage.save_inventory()

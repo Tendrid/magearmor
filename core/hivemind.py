@@ -6,7 +6,7 @@ from threading import Thread
 from mcapi import SERVER
 import time
 import logging
-
+from core.mageworld import MageWorld
 HOST = "localhost"
 PORT = 9009
 
@@ -47,9 +47,11 @@ class Telepath(object):
 
     def send_buffer(self):
         while self.message_buffer:
-            self.send(self.message_buffer.pop(0))
+            self.sendall(self.message_buffer.pop(0))
+            
 
     def loop(self):
+        message = ""
         while not SERVER.isStopping():
             if not self.connected:
                 self.connect()
@@ -61,12 +63,28 @@ class Telepath(object):
 
                     for socks in read_sockets:
                         if socks == self.server:
-                            message = socks.recv(65536)
-                            if not message:
+                            r_message = socks.recv(4096)
+                            if not r_message:
                                 self.disconnect()
                             else:
-                                hive_message = TelepathicMessage.decode(message)
-                                hive_message.execute()
+                                message += r_message
+                                recv_buffer = message.split("\n")
+                                while(len(recv_buffer) > 0):
+                                    buffer_message = recv_buffer.pop(0)
+                                    if len(buffer_message) == 0:
+                                        message = ""
+                                    else:
+                                        try:
+                                            hive_message = TelepathicMessage.decode(buffer_message)
+                                            hive_message.execute()
+                                            message = message[len(buffer_message)+1:]
+                                        except Exception as e:
+                                            print("---- JSON ERROR ----")
+                                            print(e)
+                                            print("Buffer Message:")
+                                            print(buffer_message)
+                                            print("Raw Data:")
+                                            print(message)
                 except socket.error:
                     logging.warning("error in connection")
                     self.disconnect()
@@ -84,6 +102,7 @@ class Telepath(object):
                 logging.error("Failed to send message to HiveMind: {}".format(message))
 
     def disconnect(self, *args, **kwargs):
+        print("DISCONNECTING FROM HIVEMIND")
         if self.server:
             self.server.close()
             self.server = None
@@ -138,7 +157,7 @@ class HiveConfig(TelepathicMessage):
     mind_type = "config"
 
     def execute(self):
-        pass
+        print("I JUST RECEIVED CONFIG DATA")
 
 
 @mind_type("storage")
@@ -147,7 +166,13 @@ class HiveStore(TelepathicMessage):
 
     def execute(self):
         # message to overwrite object data, and save it
-        pass
+        print(self.data)
+        plugin = MageWorld.plugins.get(self.data['data']['plugin_name'])
+        store = getattr(plugin, self.data['data']['storage_name'])
+        file = store.get_or_create(self.data['data']['uuid'])
+        file.set_data(self.data['data']['data'])
+        #store = IndexStorage.codex.get(self.data.store_name)
+        #store.set_data(self.data.data)
 
 
 @mind_type("event")

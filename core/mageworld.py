@@ -1,16 +1,26 @@
 from functools import wraps
-from mcapi import *
 from core.logs import console_log
 import json
 import copy
+import os
 
 from worlds import Worlds
 
 from core.exceptions import PlayerErrorMessage
 from org.bukkit.event.player import PlayerJoinEvent
 from org.bukkit.event.server import ServerCommandEvent
-from org.bukkit.event import EventPriority
+from org.bukkit.event import Listener, EventPriority
+from org.bukkit.plugin import EventExecutor
+from org.bukkit import Bukkit
 
+SERVER = Bukkit.getServer()
+PLUGIN = SERVER.getPluginManager().getPlugin('MinecraftPyServer')
+
+#SERVER.dispatchCommand(SERVER.getConsoleSender, "command goes here");
+
+# use this to schedule a task for the next tick
+# BukkitScheduler.runTask(Plugin, Runnable)
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/scheduler/BukkitScheduler.html#runTask(org.bukkit.plugin.Plugin,java.lang.Runnable)
 
 class EventListener(Listener):
     def __init__(self, func):
@@ -32,9 +42,13 @@ class EventListener(Listener):
             else:
                 console_log.error(e.message)
 
+class Executor(EventExecutor):
+    def execute(self, listener, event):
+        listener.execute(event)
+
 
 class WorldInstance(object):
-    dimension = None
+    dimension = os.environ.get("SERVER_NAME")
     world = SERVER.getWorlds().get(0)
     players = {}
     config = {}

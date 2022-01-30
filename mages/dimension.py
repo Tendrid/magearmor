@@ -1,7 +1,7 @@
 from core.mageworld import MageWorld
 from core.exceptions import PlayerErrorMessage
-from core.storage import DataStorage
+from core.storage import HiveStorage
 
 
-class Dimension(DataStorage):
+class Dimension(HiveStorage):
     pass

@@ -39,7 +39,7 @@ from org.bukkit.event.entity.CreatureSpawnEvent import SpawnReason
 
 def hack_func_for_overworld(thing):
     if MageWorld.dimension is not None:
-        is_kingdoms = MageWorld.dimension.uuid != "kingdoms"
+        is_kingdoms = MageWorld.dimension != "kingdoms"
     else:
         is_kingdoms = True
 

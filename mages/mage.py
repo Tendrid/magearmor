@@ -1,6 +1,6 @@
 from core.mageworld import MageWorld
 from core.exceptions import PlayerErrorMessage
-from core.storage import DataStorage
+from core.storage import HiveStorage
 from mcapi import SERVER
 from core.logs import console_log
 from java.util import UUID
@@ -9,16 +9,16 @@ from java.util import UUID
 SERVER_ROLE_ADMIN = "admin"
 SERVER_ROLE_MOD = "mod"
 
-from com.denizenscript.depenizen.bukkit.bungee import BungeeBridge
+#from com.denizenscript.depenizen.bukkit.bungee import BungeeBridge
 
-from com.denizenscript.depenizen.bukkit.bungee.packets.out import (
-    ExecuteCommandPacketOut,
-)
+#from com.denizenscript.depenizen.bukkit.bungee.packets.out import (
+#    ExecuteCommandPacketOut,
+#)
 
 from org.bukkit.inventory import ItemStack
 
 
-class Mage(DataStorage):
+class Mage(HiveStorage):
     __inventory = None
     __player = None
 
@@ -27,10 +27,9 @@ class Mage(DataStorage):
     def login(self, player=None):
         self.__player = player or SERVER.getPlayer(self.uuid)
         if self.__player:
-            self.load()
             self.data["name"] = player.getName()
             if MageWorld.dimension:
-                self.data["dimension"] = MageWorld.dimension.uuid
+                self.data["dimension"] = MageWorld.dimension
             self.load_inventory()
 
     def logoff(self):
@@ -38,10 +37,10 @@ class Mage(DataStorage):
             if self.data.get("dimension") is None:
                 console_log.warn(
                     "mage.dimension was None on {}!  This should never happen!".format(
-                        mage
+                        self.__player
                     )
                 )
-            if self.data.get("dimension") == MageWorld.dimension.uuid:
+            elif self.data.get("dimension") == MageWorld.dimension:
                 self.save_inventory()
         self.__player = SERVER.getOfflinePlayer(UUID.fromString(self.uuid))
 
@@ -78,6 +77,7 @@ class Mage(DataStorage):
             elif type(self.data[k]) is dict:
                 v.update(self.data[k])
                 self.data[k] = v
+        self.load_inventory()
 
     def load_inventory(self):
         inventory = []
