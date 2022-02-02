@@ -1,5 +1,5 @@
 from mcapi import asynchronous, synchronous
-from core.plugin import BasePlugin, PluginData
+from core.plugin import BasePlugin
 from mcapi import SERVER
 from core.storage import IndexStorage
 from mage import Mage
@@ -20,13 +20,14 @@ from core.hivemind import HiveChat
 class Plugin(BasePlugin):
     lib_name = "mages"
     config_files = ("default_mage", "config")
+    storage_files = (["mages", Mage], ["dimensions", Dimension])
 
-    def on_load(self):
-        self.mages = IndexStorage(self.lib_name, "mages", Mage)
-        self.servers = IndexStorage(self.lib_name, "dimensions", Dimension)
+    #def on_load(self):
+    #    self.mages = IndexStorage(self.lib_name, "mages", Mage)
+    #    self.servers = IndexStorage(self.lib_name, "dimensions", Dimension)
 
-        # for player in SERVER.getOnlinePlayers():
-        #    self.mages.get_or_create(player)
+    #    # for player in SERVER.getOnlinePlayers():
+    #    #    self.mages.get_or_create(player)
 
     #@asynchronous()
     #def on_server_load(self, event, mage):
@@ -57,11 +58,10 @@ class Plugin(BasePlugin):
 
     @synchronous()
     def on_player_chat(self, event, mage):
-        print(mage.name)
         HiveChat(player_name=mage.name, message=event.message).send()
         dimension_names = [
             uuid
-            for uuid, server in MageWorld.plugins["mages"].servers
+            for uuid, server in MageWorld.plugins["mages"].storage["servers"]
             if server != MageWorld.dimension
         ]
         for dimension in dimension_names:
@@ -79,7 +79,7 @@ class Plugin(BasePlugin):
             if in_hand != in_slot:
                 player = event.getInventory().getHolder()
                 if isinstance(player, Player):
-                    mage = self.mages.get(str(player.getUniqueId()))
+                    mage = self.storage['mages'].get(str(player.getUniqueId()))
                     debug_log.debug(
                         "{} replaced {} with {}".format(mage.name, in_slot, in_hand)
                     )

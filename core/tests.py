@@ -38,7 +38,8 @@ class TestHiveStorage(unittest.TestCase):
 
     def test_create_file(self):
         #TelepathicMessage.telepath = self.hive1
-        store = HiveStorage(TEST_LIB, "test_store")
+        # uuid, plugin_name, storage_name
+        store = HiveStorage("0d909fe4-ddcf-4127-ba42-5e539a20ac2c", TEST_LIB, "test_store")
 
 
         store.set_data({"a": "b"})

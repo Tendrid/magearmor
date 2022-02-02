@@ -13,6 +13,6 @@ def command_tp(mage, command):
         mage.player.sendMessage("/mages-tp <dimension>")
         mage.player.sendMessage(
             "Available Dimensions: {}".format(
-                [name for name, dimension in MageWorld.plugins["mages"].servers]
+                [name for name, dimension in MageWorld.plugins["mages"].storage["servers"]]
             )
         )

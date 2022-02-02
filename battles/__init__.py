@@ -1,6 +1,6 @@
 from core.commands import console_command
 from mcapi import asynchronous, synchronous
-from core.plugin import BasePlugin, PluginData
+from core.plugin import BasePlugin
 from mcapi import SERVER
 from core.storage import IndexStorage
 from core.mageworld import MageWorld
@@ -28,6 +28,7 @@ class Plugin(BasePlugin):
     )
     __default_armor = None
     __default_weapon = None
+
 
     def on_load(self):
         self.heros = IndexStorage(self.lib_name, "heros", Hero)

@@ -12,7 +12,7 @@ class HiveStorage(object):
     # plugin_name=self.plugin_name
     # storage_name=self.storage_name
 
-    def __init__(self, uuid, plugin_name=None, storage_name=None):
+    def __init__(self, uuid, plugin_name, storage_name):
         self.uuid = uuid
         self.plugin_name = plugin_name
         self.storage_name = storage_name
@@ -24,7 +24,6 @@ class HiveStorage(object):
     def save(self):
         #debug_log.debug("saving {}".format(str(self.uuid)))
         #debug_log.debug(self.data)
-        print(self.data)
         payload = {
             "data": self.data,
             "uuid": self.uuid,

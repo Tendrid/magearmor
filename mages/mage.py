@@ -77,6 +77,9 @@ class Mage(HiveStorage):
             elif type(self.data[k]) is dict:
                 v.update(self.data[k])
                 self.data[k] = v
+        if MageWorld.dimension:
+            self.data["dimension"] = MageWorld.dimension
+
         self.load_inventory()
 
     def load_inventory(self):
@@ -98,7 +101,7 @@ class Mage(HiveStorage):
         self.save()
 
     def teleport(self, dimension_name):
-        dimension_names = [uuid for uuid, server in MageWorld.plugins["mages"].servers]
+        dimension_names = [uuid for uuid, server in MageWorld.plugins["mages"].storage["servers"]]
         if dimension_name not in dimension_names:
             raise PlayerErrorMessage("Unknown Dimension")
         # save _before_ we do any teleporting to avoid race conditions

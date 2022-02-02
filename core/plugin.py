@@ -63,16 +63,12 @@ CALLBACKS_METHODS = {
     "on_player_chat": AsyncPlayerChatEvent,
 }
 
-
-class PluginData(object):
-    lib_name = "unknown"
-
-    def __init__(self, data):
-        self.data = data
-
+from core.storage import IndexStorage
 
 class BasePlugin(object):
     lib_name = "unknown"
+    storage = {}
+    storage_files = ()
 
     def __init__(self):
         self.load()
@@ -82,7 +78,7 @@ class BasePlugin(object):
     @property
     def config(self):
         return MageWorld.get_config(self.lib_name, "config")
-
+    
     def register_callbacks(self):
         for method_name, event_handler in CALLBACKS_METHODS.items():
             if hasattr(self, method_name):
@@ -95,11 +91,17 @@ class BasePlugin(object):
 
     def load(self):
         self._load_config()
+        self._load_storage()
 
     def _load_config(self):
         for config_name in self.config_files:
             MageWorld.register_config(self.lib_name, config_name)
         self.on_load_config()
+    
+    def _load_storage(self):
+        for storage_tup in self.storage_files:
+            self.storage[storage_tup[0]] = IndexStorage(self.lib_name, *storage_tup)
+        
 
     def on_load_config(self):
         pass

@@ -41,7 +41,7 @@ class TestTownFiles(unittest.TestCase):
         self.assertEquals(len(town.data["permissions"].keys()), 2)
 
         # load the town properly, and make sure the defaults are in there
-        mage_town = plugin.towns.get("00000000-0000-0000-0000-000000000001")
+        mage_town = plugin.storage["towns"].get("00000000-0000-0000-0000-000000000001")
 
         default_data = MageWorld.get_config(Plugin.lib_name, "default_town")
         self.assertEquals(

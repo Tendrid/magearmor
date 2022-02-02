@@ -1,6 +1,6 @@
 from mcapi import asynchronous, synchronous, SERVER, PLUGIN
 from core.mageworld import MageWorld
-from core.plugin import BasePlugin, PluginData
+from core.plugin import BasePlugin
 from org.bukkit.persistence import PersistentDataType
 
 from core.storage import IndexStorage

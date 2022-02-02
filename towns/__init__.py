@@ -1,6 +1,6 @@
 from mcapi import asynchronous, synchronous, SERVER
 from core.mageworld import MageWorld
-from core.plugin import BasePlugin, PluginData
+from core.plugin import BasePlugin
 
 from town import Town, TOWN_CLAIM_TYPE_NORMAL
 
@@ -55,10 +55,13 @@ class Wilderness(Town):
     def add_chunk(self, *args, **kwargs):
         pass
 
+#self.player_data = IndexStorage(self.lib_name, "players")
+#self.towns = IndexStorage(self.lib_name, "towns", Town)
 
 class Plugin(BasePlugin):
     lib_name = "towns"
     config_files = ("default_town", "wilderness", "config")
+    storage_files = (["players"], ["towns", Town])
     __wilderness = None
 
     claims_by_loc = defaultdict(dict)
@@ -74,7 +77,7 @@ class Plugin(BasePlugin):
         return self.claims_by_loc[x].get(z)
 
     def player_town(self, uuid):
-        player_data = self.player_data.get_or_create(mage.uuid)
+        player_data = self.storage["players"].get_or_create(mage.uuid)
 
     def get_town_by_player_uuid(self, player_uuid):
         return self.towns_by_player.get(player_uuid)
@@ -122,7 +125,7 @@ class Plugin(BasePlugin):
         )
 
         self.claims_by_loc[x][z] = town
-        self.towns.get(town.uuid).save()
+        self.storage["towns"].get(town.uuid).save()
         self.dynmap_update_chunk(int(x), int(z))
 
     def unclaim(self, mage, x, z, world_uuid):
@@ -136,7 +139,7 @@ class Plugin(BasePlugin):
         town.remove_chunk(int(x), int(z), str(world_uuid))
 
         del self.claims_by_loc[x][z]
-        self.towns.get(town.uuid).save()
+        self.storage["towns"].get(town.uuid).save()
         self.dynmap_update_chunk(int(x), int(z))
 
     def create_town(self, mage):
@@ -146,14 +149,14 @@ class Plugin(BasePlugin):
                 "You're already the owner of {}".format(player_town.name)
             )
 
-        town = self.towns.add(str(uuid4()))
+        town = self.storage["towns"].add(str(uuid4()))
         town.set_owner(mage)
         town.save()
         self.towns_by_player[mage.uuid] = town
         return town
 
     def remove_town(self, uuid):
-        self.towns.remove(uuid)
+        self.storage["towns"].remove(uuid)
 
     # def on_load_config(self):
     #     towns_default = MageWorld.get_config(self.lib_name, "towns_default")
@@ -190,16 +193,14 @@ class Plugin(BasePlugin):
             self.dynmap_update_chunk(chunk[0], chunk[1])
 
     def on_load(self):
-        self.player_data = IndexStorage(self.lib_name, "players")
-        self.towns = IndexStorage(self.lib_name, "towns", Town)
-        for town_uuid, town in self.towns:
+        for town_uuid, town in self.storage["towns"]:
             if town.data["owner"]:
                 self.towns_by_player[town.data["owner"]] = town
             for chunk in town.data.get("chunks"):
                 self.claims_by_loc[chunk[0]][chunk[1]] = town
         # run towns_fix_cuboids
         # run towns_update_dynmap_all_towns
-        for uuid, town in self.towns:
+        for uuid, town in self.storage["towns"]:
             self.dynmap_reset_town(town)
 
     @asynchronous()

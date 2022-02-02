@@ -79,12 +79,13 @@ class Telepath(object):
                                             hive_message.execute()
                                             message = message[len(buffer_message)+1:]
                                         except Exception as e:
-                                            print("---- JSON ERROR ----")
-                                            print(e)
-                                            print("Buffer Message:")
-                                            print(buffer_message)
-                                            print("Raw Data:")
-                                            print(message)
+                                            pass
+                                            #print("---- JSON ERROR ----")
+                                            #print(e)
+                                            #print("Buffer Message:")
+                                            #print(buffer_message)
+                                            #print("Raw Data:")
+                                            #print(message)
                 except socket.error:
                     logging.warning("error in connection")
                     self.disconnect()
@@ -116,6 +117,7 @@ class TelepathicMessage(object):
         self.data = kwargs
 
     def send(self):
+        print("SENDING: {}".format(self.data.get('data', {}).get('plugin_name')))
         message = json.dumps({"mind_type": self.mind_type, "data": self.data})
         self.telepath.send(message)
 
@@ -166,9 +168,10 @@ class HiveStore(TelepathicMessage):
 
     def execute(self):
         # message to overwrite object data, and save it
-        print(self.data)
+        print("RECEIVED: {}".format(self.data['data']['plugin_name']))
         plugin = MageWorld.plugins.get(self.data['data']['plugin_name'])
-        store = getattr(plugin, self.data['data']['storage_name'])
+        #store = getattr(plugin, self.data['data']['storage_name'])
+        store = plugin.storage[self.data['data']['storage_name']]
         file = store.get_or_create(self.data['data']['uuid'])
         file.set_data(self.data['data']['data'])
         #store = IndexStorage.codex.get(self.data.store_name)
