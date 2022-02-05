@@ -2,7 +2,6 @@ from core.commands import console_command
 from mcapi import asynchronous, synchronous
 from core.plugin import BasePlugin
 from mcapi import SERVER
-from core.storage import IndexStorage
 from core.mageworld import MageWorld
 from core.logs import debug_log, console_log
 from hero import Hero
@@ -28,10 +27,9 @@ class Plugin(BasePlugin):
     )
     __default_armor = None
     __default_weapon = None
-
+    storage_files = (["heros", Hero],)
 
     def on_load(self):
-        self.heros = IndexStorage(self.lib_name, "heros", Hero)
         self.load_entities()
         self.load_materials()
         self.load_weapons()
@@ -82,7 +80,7 @@ class Plugin(BasePlugin):
         return self.__default_weapon
 
     def battles_calc_armor(self, mage):
-        hero = self.heros.get_or_create(mage.uuid)
+        hero = self.storage["heros"].get_or_create(mage.uuid)
         player_armor = {x: [] for x in self.config["damage_types"].keys()}
 
         modifiers = [
@@ -94,7 +92,7 @@ class Plugin(BasePlugin):
 
         armor = sum(modifiers) / len(modifiers)
 
-        hero = self.heros.get_or_create(mage.uuid)
+        hero = self.storage["heros"].get_or_create(mage.uuid)
         hero.set_data(armor.modifiers)
         hero.save()
 
@@ -126,7 +124,7 @@ class Plugin(BasePlugin):
         if hasattr(event, "damager"):
             if event.getEntityType() == PLAYER:
                 console_log.info("Player Hit!")
-                hero = self.heros.get_or_create(str(event.entity.getUniqueId()))
+                hero = self.storage["heros"].get_or_create(str(event.entity.getUniqueId()))
                 armor_set = hero.armor_set
             else:
                 console_log.info("Mob Hit! {}".format(event.entity.getType()))

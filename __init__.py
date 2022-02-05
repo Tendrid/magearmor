@@ -17,6 +17,9 @@ import towns
 import battles
 import mobscale
 
+### Import Telepath #############################
+from core.hivemind import Telepath
+
 # import spells
 
 MageWorld.load_plugin(mages.Plugin)
@@ -25,6 +28,7 @@ MageWorld.load_plugin(battles.Plugin)
 MageWorld.load_plugin(mobscale.Plugin)
 # MageWorld.load_plugin(spells.Plugin)
 
+Telepath.start()
 
 ### Import Commands #############################
 # from mages import commands

@@ -13,7 +13,7 @@ PORT = 9009
 from functools import wraps
 
 
-class Telepath(object):
+class TelepathClass(object):
     retry = 3
     message_buffer = []
 
@@ -23,6 +23,7 @@ class Telepath(object):
         self.connected = False
         self.server = None
 
+    def start(self):
         # this may need to be in connect, if we run into reconnection issues
         # signal.signal(signal.SIGINT, self.disconnect)
         # signal.signal(signal.SIGTERM, self.disconnect)
@@ -78,7 +79,7 @@ class Telepath(object):
                                             hive_message = TelepathicMessage.decode(buffer_message)
                                             hive_message.execute()
                                             message = message[len(buffer_message)+1:]
-                                        except Exception as e:
+                                        except ValueError as e:
                                             pass
                                             #print("---- JSON ERROR ----")
                                             #print(e)
@@ -109,16 +110,17 @@ class Telepath(object):
             self.server = None
         self.connected = False
 
+Telepath = TelepathClass(str(HOST), int(PORT))
 
 class TelepathicMessage(object):
-    telepath = Telepath(str(HOST), int(PORT))
+    telepath = Telepath
 
     def __init__(self, **kwargs):
         self.data = kwargs
 
     def send(self):
         print("SENDING: {}".format(self.data.get('data', {}).get('plugin_name')))
-        message = json.dumps({"mind_type": self.mind_type, "data": self.data})
+        message = json.dumps({"mind_type": self.mind_type, "payload": self.data})
         self.telepath.send(message)
 
     @classmethod
@@ -131,7 +133,7 @@ class TelepathicMessage(object):
         decoded = json.loads(data)
         ht = HIVE_TYPE_REGISTRY.get(decoded["mind_type"])
 
-        return ht(**decoded["data"])
+        return ht(**decoded["payload"])
 
     def execute(self):
         raise NotImplementedError()
@@ -159,6 +161,7 @@ class HiveConfig(TelepathicMessage):
     mind_type = "config"
 
     def execute(self):
+        print(self.data)
         print("I JUST RECEIVED CONFIG DATA")
 
 
@@ -168,12 +171,17 @@ class HiveStore(TelepathicMessage):
 
     def execute(self):
         # message to overwrite object data, and save it
-        print("RECEIVED: {}".format(self.data['data']['plugin_name']))
-        plugin = MageWorld.plugins.get(self.data['data']['plugin_name'])
+        #print("RECEIVED: {}".format(self.data['plugin_name']))
+        plugin = MageWorld.plugins.get(self.data['plugin_name'])
         #store = getattr(plugin, self.data['data']['storage_name'])
-        store = plugin.storage[self.data['data']['storage_name']]
-        file = store.get_or_create(self.data['data']['uuid'])
-        file.set_data(self.data['data']['data'])
+
+        store = plugin.storage.get(self.data['storage_name'])
+        if store is None:
+            logging.error("Failed to load storage ({}) for plugin ({})".format(self.data['storage_name'], self.data['plugin_name']))
+            return
+
+        file = store.get_or_create(self.data['uuid'])
+        file.set_data(self.data['plugin_data'])
         #store = IndexStorage.codex.get(self.data.store_name)
         #store.set_data(self.data.data)
 
@@ -187,7 +195,7 @@ class HiveEvent(TelepathicMessage):
         pass
 
 
-# name, message
+# player_name, message
 @mind_type("chat")
 class HiveChat(TelepathicMessage):
     def execute(self):

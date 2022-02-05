@@ -3,8 +3,6 @@ from core.mageworld import MageWorld
 from core.plugin import BasePlugin
 from org.bukkit.persistence import PersistentDataType
 
-from core.storage import IndexStorage
-
 from collections import defaultdict
 from core.exceptions import PlayerErrorMessage
 

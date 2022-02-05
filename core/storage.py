@@ -19,18 +19,20 @@ class HiveStorage(object):
         self.set_data({})
 
     def set_data(self, data):
+        print("LOADING DATA FOR PLUGIN:{} WITH UUID: {}".format(self.uuid, self.plugin_name))
+        print(data)
         self.data = data
 
     def save(self):
         #debug_log.debug("saving {}".format(str(self.uuid)))
         #debug_log.debug(self.data)
         payload = {
-            "data": self.data,
+            "plugin_data": self.data,
             "uuid": self.uuid,
             "plugin_name": self.plugin_name,
             "storage_name": self.storage_name
         }
-        HiveStore(data=payload).send()
+        HiveStore(**payload).send()
 
 __CODEX = {}
 class IndexStorage(object):

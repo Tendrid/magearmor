@@ -4,8 +4,6 @@ from core.plugin import BasePlugin
 
 from town import Town, TOWN_CLAIM_TYPE_NORMAL
 
-from core.storage import IndexStorage
-
 from collections import defaultdict
 from core.exceptions import PlayerErrorMessage
 
@@ -54,9 +52,6 @@ class Wilderness(Town):
 
     def add_chunk(self, *args, **kwargs):
         pass
-
-#self.player_data = IndexStorage(self.lib_name, "players")
-#self.towns = IndexStorage(self.lib_name, "towns", Town)
 
 class Plugin(BasePlugin):
     lib_name = "towns"

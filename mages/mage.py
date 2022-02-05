@@ -54,7 +54,7 @@ class Mage(HiveStorage):
 
     @property
     def name(self):
-        return self.player.name
+        return self.player.getName()
 
     @property
     def location(self):
@@ -79,14 +79,17 @@ class Mage(HiveStorage):
                 self.data[k] = v
         if MageWorld.dimension:
             self.data["dimension"] = MageWorld.dimension
-
-        self.load_inventory()
+        if self.player.isOnline():
+            print("PLAYER IS ONLINE")
+            self.load_inventory()
 
     def load_inventory(self):
         inventory = []
         for stack in self.data["inventory"]:
             if stack:
                 inventory.append(ItemStack.deserializeBytes(stack))
+                #inventory.append(ItemStack.deserialize(stack))
+
             else:
                 inventory.append(stack)
         self.inventory.setContents(inventory)
@@ -95,7 +98,9 @@ class Mage(HiveStorage):
         self.data["inventory"] = []
         for stack in self.inventory.getContents():
             if stack:
+                #print(stack.toString())
                 self.data["inventory"].append(list(stack.serializeAsBytes()))
+                #self.data["inventory"].append(stack.serialize())
             else:
                 self.data["inventory"].append(None)
         self.save()

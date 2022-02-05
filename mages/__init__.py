@@ -1,7 +1,6 @@
 from mcapi import asynchronous, synchronous
 from core.plugin import BasePlugin
 from mcapi import SERVER
-from core.storage import IndexStorage
 from mage import Mage
 from dimension import Dimension
 from core.mageworld import MageWorld
@@ -23,8 +22,6 @@ class Plugin(BasePlugin):
     storage_files = (["mages", Mage], ["dimensions", Dimension])
 
     #def on_load(self):
-    #    self.mages = IndexStorage(self.lib_name, "mages", Mage)
-    #    self.servers = IndexStorage(self.lib_name, "dimensions", Dimension)
 
     #    # for player in SERVER.getOnlinePlayers():
     #    #    self.mages.get_or_create(player)
@@ -59,17 +56,17 @@ class Plugin(BasePlugin):
     @synchronous()
     def on_player_chat(self, event, mage):
         HiveChat(player_name=mage.name, message=event.message).send()
-        dimension_names = [
-            uuid
-            for uuid, server in MageWorld.plugins["mages"].storage["servers"]
-            if server != MageWorld.dimension
-        ]
-        for dimension in dimension_names:
-            announce_cmd = 'ex bungee {} {{ - announce "<&lt>{}<&gt> {}" }}'.format(
-                dimension, mage.name, event.message
-            )
+        #dimension_names = [
+        #    uuid
+        #    for uuid, server in MageWorld.plugins["mages"].storage["servers"]
+        #    if server != MageWorld.dimension
+        #]
+        #for dimension in dimension_names:
+        #    announce_cmd = 'ex bungee {} {{ - announce "<&lt>{}<&gt> {}" }}'.format(
+        #        dimension, mage.name, event.message
+        #    )
 
-            SERVER.dispatchCommand(SERVER.getConsoleSender(), announce_cmd)
+        #    SERVER.dispatchCommand(SERVER.getConsoleSender(), announce_cmd)
 
     def on_inventoy_click(self, event, mage):
         inventory = event.getClickedInventory()
