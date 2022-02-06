@@ -53,7 +53,6 @@ class Plugin(BasePlugin):
         config = MageWorld.get_config(self.lib_name, "config")
 
         name = entity.getType().name().title().replace("_", " ")
-        health = int(math.ceil(entity.getHealth()))
 
         level = store.get(key, PersistentDataType.INTEGER)
         if not level:
@@ -61,6 +60,8 @@ class Plugin(BasePlugin):
             store.set(key, PersistentDataType.INTEGER, level)
         else:
             entity.setCustomNameVisible(True)
+
+        health = int(math.ceil(entity.getHealth()))
 
 
         entity.setCustomName(unicode("{} [{}{} {}{}]".format(name, config['lvl_icon'], level, config['health_icon'], health )))
